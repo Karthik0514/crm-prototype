@@ -14,18 +14,37 @@ import { useParams } from "react-router-dom";
 import api from "../services/api";
 export default function LeadDetails() {
     const { id } = useParams();
-
+    const [emailData, setEmailData] = useState(null);
+    const [loadingEmail, setLoadingEmail] = useState(false);
     const [lead, setLead] = useState(null);
+    const [analysis, setAnalysis] = useState(null);
+    const [whatsAppData, setWhatsAppData] = useState(null);
+    const [loadingWhatsApp, setLoadingWhatsApp] = useState(false);
+    const generateEmail = async () => {
+        try {
+            setLoadingEmail(true);
 
+            const response = await api.get(`/leads/${id}/email`);
+
+            setEmailData(response.data);
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoadingEmail(false);
+        }
+    };
     useEffect(() => {
 
-        const fetchLead = async () => {
+        const fetchData = async () => {
 
             try {
 
-                const response = await api.get(`/leads/${id}`);
+                const leadResponse = await api.get(`/leads/${id}`);
+                setLead(leadResponse.data);
 
-                setLead(response.data);
+                const aiResponse = await api.get(`/leads/${id}/analyze`);
+                setAnalysis(aiResponse.data);
 
             } catch (err) {
 
@@ -35,14 +54,27 @@ export default function LeadDetails() {
 
         };
 
-        fetchLead();
+        fetchData();
 
     }, [id]);
 
-    if (!lead) {
+    if (!lead || !analysis) {
         return <div className="p-8">Loading...</div>;
     }
+    const generateWhatsApp = async () => {
+        try {
+            setLoadingWhatsApp(true);
 
+            const response = await api.get(`/leads/${id}/whatsapp`);
+
+            setWhatsAppData(response.data);
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoadingWhatsApp(false);
+        }
+    };
     return (
 
         <div className="space-y-6">
@@ -69,10 +101,15 @@ export default function LeadDetails() {
 
                     </div>
 
-                    <span className="bg-green-100 text-green-700 px-4 py-2 rounded-full h-fit">
-
-                        {lead.status}
-
+                    <span
+                        className={`px-4 py-2 rounded-full h-fit text-white ${analysis.priority === "Hot"
+                                ? "bg-red-500"
+                                : analysis.priority === "Warm"
+                                    ? "bg-yellow-500"
+                                    : "bg-blue-500"
+                            }`}
+                    >
+                        {analysis.priority}
                     </span>
 
                 </div>
@@ -157,7 +194,7 @@ export default function LeadDetails() {
 
                             <h1 className="text-5xl font-bold text-blue-600">
 
-                                92%
+                                {analysis.lead_score}
 
                             </h1>
 
@@ -173,7 +210,7 @@ export default function LeadDetails() {
 
                             <p className="text-green-600">
 
-                                High
+                                {analysis.buying_intent}
                             </p>
 
                         </div>
@@ -188,8 +225,7 @@ export default function LeadDetails() {
 
                             <p className="text-gray-600">
 
-                                {lead.notes}
-
+                                {analysis.summary}
                             </p>
 
                         </div>
@@ -197,6 +233,21 @@ export default function LeadDetails() {
                     </div>
 
                 </div>
+
+            </div>
+            <div>
+
+                <p className="font-semibold">
+
+                    Next Action
+
+                </p>
+
+                <p className="text-gray-600">
+
+                    {analysis.next_action}
+
+                </p>
 
             </div>
 
@@ -250,25 +301,71 @@ export default function LeadDetails() {
 
             {/* Buttons */}
 
-            <div className="flex gap-4">
+            <div className="space-y-6">
+                <div className="flex gap-4">
 
-                <button className="bg-blue-600 text-white px-6 py-3 rounded-xl">
+                    <button
+                        onClick={generateEmail}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg"
+                    >
+                        {loadingEmail ? "Generating..." : "Generate Email"}
+                    </button>
 
-                    Analyze with AI
+                    <button
+                        onClick={generateWhatsApp}
+                        className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg"
+                    >
+                        {loadingWhatsApp ? "Generating..." : "Generate WhatsApp"}
+                    </button>
 
-                </button>
+                </div>
 
-                <button className="bg-green-600 text-white px-6 py-3 rounded-xl">
+                {emailData && (
+                    <div className="mt-6 flex-1 bg-white rounded-2xl shadow-lg border p-6">
 
-                    Convert to Sale
+                        <h2 className="text-2xl font-bold text-gray-800">
+                            {emailData.subject}
+                        </h2>
 
-                </button>
+                        <div className="mt-6 whitespace-pre-wrap text-gray-700 space-y-4">
 
-                <button className="bg-gray-800 text-white px-6 py-3 rounded-xl">
+                            <p className="font-semibold text-lg">
+                                {emailData.greeting}
+                            </p>
 
-                    Add Note
+                            <p>
+                                {emailData.body}
+                            </p>
 
-                </button>
+                            <p className="font-semibold">
+                                {emailData.closing}
+                            </p>
+
+                        </div>
+
+                    </div>
+                )}
+               
+                {whatsAppData && (
+                    <div className="mt-4 bg-white border rounded-lg p-5">
+                        <h3 className="font-bold mb-2">WhatsApp Message</h3>
+                        <pre className="whitespace-pre-wrap">
+                            {whatsAppData.message}
+                        </pre>
+                    </div>
+                )}
+                <div className="flex gap-4">
+
+                    <button className="bg-green-600 text-white px-6 py-3 rounded-xl">
+                        Convert to Sale
+                    </button>
+
+                    <button className="bg-gray-800 text-white px-6 py-3 rounded-xl">
+                        Add Note
+                    </button>
+
+                </div>
+               
 
             </div>
 

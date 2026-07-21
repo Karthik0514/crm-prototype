@@ -1,13 +1,13 @@
 import json
 import ollama
 
-from prompts import LEAD_ANALYSIS_PROMPT
-from schemas import LeadAnalysis
+from prompts import WHATSAPP_PROMPT
+from schemas import WhatsAppResponse
 
 
-def analyze_lead(lead):
+def generate_whatsapp(lead):
 
-    prompt = LEAD_ANALYSIS_PROMPT.format(
+    prompt = WHATSAPP_PROMPT.format(
         name=lead.name,
         company=lead.company,
         phone=lead.phone,
@@ -25,7 +25,7 @@ def analyze_lead(lead):
                 "content": prompt
             }
         ],
-        format=LeadAnalysis.model_json_schema()
+        format=WhatsAppResponse.model_json_schema()
     )
 
     return json.loads(response["message"]["content"])

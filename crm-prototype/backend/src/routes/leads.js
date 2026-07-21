@@ -1,6 +1,8 @@
 import express from "express";
 import db from "../database/db.js";
-
+import { generateEmail } from "../services/emailService.js";
+import { analyzeLead } from "../services/aiService.js";
+import { generateWhatsApp } from "../services/whatsappService.js";
 const router = express.Router();
 
 // GET ALL LEADS
@@ -33,6 +35,42 @@ router.get("/:id", (req, res) => {
                 });
 
             res.json(row);
+
+        }
+    );
+
+});
+
+router.get("/:id/analyze", (req, res) => {
+
+    db.get(
+        "SELECT * FROM leads WHERE id = ?",
+        [req.params.id],
+        async (err, row) => {
+
+            if (err)
+                return res.status(500).json(err);
+
+            if (!row)
+                return res.status(404).json({
+                    message: "Lead not found"
+                });
+
+            try {
+
+                const analysis = await analyzeLead(row);
+
+                res.json(analysis);
+
+            } catch (err) {
+
+                console.error(err);
+
+                res.status(500).json({
+                    message: "AI analysis failed"
+                });
+
+            }
 
         }
     );
@@ -80,4 +118,75 @@ router.post("/", (req, res) => {
 
 });
 
+router.get("/:id/email", (req, res) => {
+
+    db.get(
+        "SELECT * FROM leads WHERE id = ?",
+        [req.params.id],
+        async (err, lead) => {
+
+            if (err)
+                return res.status(500).json(err);
+
+            if (!lead)
+                return res.status(404).json({
+                    message: "Lead not found"
+                });
+
+            try {
+
+                const email = await generateEmail(lead);
+
+                res.json(email);
+
+            } catch (err) {
+
+                console.error(err);
+
+                res.status(500).json({
+                    message: "Failed to generate email"
+                });
+
+            }
+
+        }
+    );
+
+});
+
+router.get("/:id/whatsapp", (req, res) => {
+
+    db.get(
+        "SELECT * FROM leads WHERE id = ?",
+        [req.params.id],
+        async (err, lead) => {
+
+            if (err)
+                return res.status(500).json(err);
+
+            if (!lead)
+                return res.status(404).json({
+                    message: "Lead not found"
+                });
+
+            try {
+
+                const whatsapp = await generateWhatsApp(lead);
+
+                res.json(whatsapp);
+
+            } catch (err) {
+
+                console.error(err);
+
+                res.status(500).json({
+                    message: "WhatsApp generation failed"
+                });
+
+            }
+
+        }
+    );
+
+});
 export default router;
