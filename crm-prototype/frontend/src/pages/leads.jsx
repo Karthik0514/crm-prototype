@@ -1,8 +1,22 @@
 import LeadTable from "../components/lead_table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import api from "../services/api";
 import AddLeadModal from "../components/add_lead_model";
 export default function Leads() {
     const [openModal, setOpenModal] = useState(false);
+    const [leads, setLeads] = useState([]);
+    const fetchLeads = async () => {
+        try {
+            const response = await api.get("/leads");
+            setLeads(response.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        fetchLeads();
+    }, []);
     return (
         <div>
 
@@ -71,9 +85,10 @@ export default function Leads() {
             <AddLeadModal
                 open={openModal}
                 setOpen={setOpenModal}
+                fetchLeads={fetchLeads}
             />
 
-            <LeadTable />
+            <LeadTable leads={leads} />
 
         </div>
     );

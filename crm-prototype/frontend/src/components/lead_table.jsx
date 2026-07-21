@@ -1,31 +1,5 @@
 import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-const leads = [
-    {
-        id: 1,
-        name: "Rahul Sharma",
-        company: "ABC Pvt Ltd",
-        phone: "9876543210",
-        source: "IndiaMART",
-        status: "Interested",
-    },
-    {
-        id: 2,
-        name: "Sneha Reddy",
-        company: "Green Solar",
-        phone: "9988776655",
-        source: "TradeIndia",
-        status: "New",
-    },
-    {
-        id: 3,
-        name: "Arjun Kumar",
-        company: "PowerTech",
-        phone: "9123456789",
-        source: "LinkedIn",
-        status: "Follow Up",
-    },
-];
 
 const statusColors = {
     New: "bg-blue-100 text-blue-700",
@@ -34,8 +8,9 @@ const statusColors = {
     Converted: "bg-purple-100 text-purple-700",
 };
 
-export default function LeadTable() {
+export default function LeadTable({leads}) {
     const navigate = useNavigate();
+    
     return (
         <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
 
@@ -58,7 +33,7 @@ export default function LeadTable() {
 
                 <tbody>
 
-                    {leads.map((lead) => (
+                    {(leads || []).map((lead) => (
 
                         <tr
                             key={lead.id}

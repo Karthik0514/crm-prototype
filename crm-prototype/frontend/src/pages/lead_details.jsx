@@ -9,7 +9,39 @@ import {
     MessageSquare,
 } from "lucide-react";
 
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import api from "../services/api";
 export default function LeadDetails() {
+    const { id } = useParams();
+
+    const [lead, setLead] = useState(null);
+
+    useEffect(() => {
+
+        const fetchLead = async () => {
+
+            try {
+
+                const response = await api.get(`/leads/${id}`);
+
+                setLead(response.data);
+
+            } catch (err) {
+
+                console.error(err);
+
+            }
+
+        };
+
+        fetchLead();
+
+    }, [id]);
+
+    if (!lead) {
+        return <div className="p-8">Loading...</div>;
+    }
 
     return (
 
@@ -25,13 +57,13 @@ export default function LeadDetails() {
 
                         <h1 className="text-4xl font-bold">
 
-                            Rahul Sharma
+                            {lead.name}
 
                         </h1>
 
                         <p className="text-gray-500 mt-2">
 
-                            ABC Pvt Ltd
+                            {lead.company}
 
                         </p>
 
@@ -39,7 +71,7 @@ export default function LeadDetails() {
 
                     <span className="bg-green-100 text-green-700 px-4 py-2 rounded-full h-fit">
 
-                        Interested
+                        {lead.status}
 
                     </span>
 
@@ -65,7 +97,7 @@ export default function LeadDetails() {
 
                             <Phone size={18} />
 
-                            9876543210
+                            {lead.phone}
 
                         </div>
 
@@ -73,7 +105,7 @@ export default function LeadDetails() {
 
                             <Mail size={18} />
 
-                            rahul@gmail.com
+                            {lead.email}
 
                         </div>
 
@@ -81,7 +113,7 @@ export default function LeadDetails() {
 
                             <Building size={18} />
 
-                            IndiaMART
+                            {lead.source}
 
                         </div>
 
@@ -156,9 +188,7 @@ export default function LeadDetails() {
 
                             <p className="text-gray-600">
 
-                                Customer is interested in installing
-                                rooftop solar panels and requested
-                                a quotation.
+                                {lead.notes}
 
                             </p>
 
