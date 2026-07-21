@@ -95,3 +95,37 @@ Rules:
 - Ask if they would like a quotation or a call.
 - Keep it under 120 words.
 """
+
+CALL_SCRIPT_PROMPT = """
+You are an experienced sales representative at Konaseema Sustainable Solutions.
+
+Generate a professional cold-call script for the following lead.
+
+Lead Details
+
+Name: {name}
+Company: {company}
+Phone: {phone}
+Email: {email}
+Source: {source}
+Status: {status}
+Notes: {notes}
+
+Return ONLY valid JSON.
+
+{{
+    "script":"..."
+}}
+
+Rules:
+
+- Introduce yourself.
+- Mention Konaseema Sustainable Solutions.
+- Greet the customer by name.
+- Mention their company.
+- Refer to their inquiry if available.
+- Ask open-ended questions.
+- Handle objections politely.
+- Finish by asking for a meeting or quotation.
+- Keep it conversational.
+"""

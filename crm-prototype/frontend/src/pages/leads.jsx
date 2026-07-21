@@ -5,6 +5,7 @@ import AddLeadModal from "../components/add_lead_model";
 export default function Leads() {
     const [openModal, setOpenModal] = useState(false);
     const [leads, setLeads] = useState([]);
+    const [search, setSearch] = useState("");
     const fetchLeads = async () => {
         try {
             const response = await api.get("/leads");
@@ -17,6 +18,18 @@ export default function Leads() {
     useEffect(() => {
         fetchLeads();
     }, []);
+    const filteredLeads = leads.filter((lead) => {
+
+        const query = search.toLowerCase();
+
+        return (
+            (lead.name || "").toLowerCase().includes(query) ||
+            (lead.company || "").toLowerCase().includes(query) ||
+            (lead.email || "").toLowerCase().includes(query) ||
+            (lead.phone || "").toLowerCase().includes(query)
+        );
+
+    });
     return (
         <div>
 
@@ -47,7 +60,10 @@ export default function Leads() {
                 <div className="flex gap-4">
 
                     <input
+                        type="text"
                         placeholder="Search Lead..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                         className="border rounded-xl px-4 py-3 flex-1"
                     />
 
@@ -88,8 +104,7 @@ export default function Leads() {
                 fetchLeads={fetchLeads}
             />
 
-            <LeadTable leads={leads} />
-
+            <LeadTable leads={filteredLeads} />
         </div>
     );
 }

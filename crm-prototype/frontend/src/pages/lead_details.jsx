@@ -10,16 +10,21 @@ import {
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
+import AddLeadModal from "../components/add_lead_model";
 export default function LeadDetails() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [emailData, setEmailData] = useState(null);
     const [loadingEmail, setLoadingEmail] = useState(false);
     const [lead, setLead] = useState(null);
     const [analysis, setAnalysis] = useState(null);
     const [whatsAppData, setWhatsAppData] = useState(null);
     const [loadingWhatsApp, setLoadingWhatsApp] = useState(false);
+    const [callScript, setCallScript] = useState(null);
+    const [loadingCallScript, setLoadingCallScript] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
     const generateEmail = async () => {
         try {
             setLoadingEmail(true);
@@ -34,30 +39,24 @@ export default function LeadDetails() {
             setLoadingEmail(false);
         }
     };
+    const refreshLead = async () => {
+        try {
+
+            const leadResponse = await api.get(`/leads/${id}`);
+            setLead(leadResponse.data);
+
+            const aiResponse = await api.get(`/leads/${id}/analyze`);
+            setAnalysis(aiResponse.data);
+
+        } catch (err) {
+
+            console.error(err);
+
+        }
+    };
     useEffect(() => {
-
-        const fetchData = async () => {
-
-            try {
-
-                const leadResponse = await api.get(`/leads/${id}`);
-                setLead(leadResponse.data);
-
-                const aiResponse = await api.get(`/leads/${id}/analyze`);
-                setAnalysis(aiResponse.data);
-
-            } catch (err) {
-
-                console.error(err);
-
-            }
-
-        };
-
-        fetchData();
-
+        refreshLead();
     }, [id]);
-
     if (!lead || !analysis) {
         return <div className="p-8">Loading...</div>;
     }
@@ -75,6 +74,53 @@ export default function LeadDetails() {
             setLoadingWhatsApp(false);
         }
     };
+    const generateCallScript = async () => {
+
+        try {
+
+            setLoadingCallScript(true);
+
+            const response = await api.get(`/leads/${id}/call-script`);
+
+            setCallScript(response.data);
+
+        } catch (err) {
+
+            console.error(err);
+
+        } finally {
+
+            setLoadingCallScript(false);
+
+        }
+
+    };
+    const deleteLead = async () => {
+
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete this lead?"
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+
+            await api.delete(`/leads/${id}`);
+
+            alert("Lead deleted successfully.");
+
+            navigate("/leads");
+
+        } catch (err) {
+
+            console.error(err);
+
+            alert("Failed to delete lead.");
+
+        }
+
+    };
+    
     return (
 
         <div className="space-y-6">
@@ -317,6 +363,12 @@ export default function LeadDetails() {
                     >
                         {loadingWhatsApp ? "Generating..." : "Generate WhatsApp"}
                     </button>
+                    <button
+                        onClick={generateCallScript}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-lg"
+                    >
+                        {loadingCallScript ? "Generating..." : "Generate Call Script"}
+                    </button>
 
                 </div>
 
@@ -354,18 +406,48 @@ export default function LeadDetails() {
                         </pre>
                     </div>
                 )}
+                {callScript && (
+                    <div className="bg-white rounded-xl border shadow p-6">
+
+                        <h2 className="text-xl font-bold">
+                            Call Script
+                        </h2>
+
+                        <pre className="mt-4 whitespace-pre-wrap">
+                            {callScript.script}
+                        </pre>
+
+                    </div>
+                )}
                 <div className="flex gap-4">
 
-                    <button className="bg-green-600 text-white px-6 py-3 rounded-xl">
+                    <button className="bg-green-600 hover:bg-green-700 active:scale-95 transition-all duration-200 cursor-pointer text-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg">
                         Convert to Sale
                     </button>
 
-                    <button className="bg-gray-800 text-white px-6 py-3 rounded-xl">
+                    <button className="bg-gray-800 hover:bg-black active:scale-95 transition-all duration-200 cursor-pointer text-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg">
                         Add Note
+                    </button>
+                    <button
+                        onClick={() => setEditOpen(true)}
+                        className="bg-yellow-500 hover:bg-yellow-600 active:scale-95 transition-all duration-200 cursor-pointer text-black font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg"
+                    >
+                        Edit Lead
+                    </button>
+                    <button
+                        onClick={deleteLead}
+                        className="bg-red-600 hover:bg-red-700 active:scale-95 transition-all duration-200 cursor-pointer text-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg"
+                    >
+                        Delete Lead
                     </button>
 
                 </div>
-               
+                <AddLeadModal
+                    open={editOpen}
+                    setOpen={setEditOpen}
+                    fetchLeads={refreshLead}
+                    editingLead={lead}
+                />
 
             </div>
 

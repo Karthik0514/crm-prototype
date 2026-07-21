@@ -26,3 +26,6 @@ class EmailResponse(BaseModel):
 
 class WhatsAppResponse(BaseModel):
     message: str
+    
+class CallScriptResponse(BaseModel):
+    script: str

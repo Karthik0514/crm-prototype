@@ -1,9 +1,11 @@
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../services/api";
 export default function AddLeadModal({ open,
     setOpen,
-    fetchLeads }) {
+    fetchLeads,
+    editingLead = null
+ }) {
 
     const [formData, setFormData] = useState({
         name: "",
@@ -14,22 +16,23 @@ export default function AddLeadModal({ open,
         status: "",
         notes: ""
     });
+    useEffect(() => {
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+        if (!open) return;
 
-    const handleSave = async () => {
-        try {
+        if (editingLead) {
 
-            await api.post("/leads", formData);
+            setFormData({
+                name: editingLead.name,
+                company: editingLead.company,
+                phone: editingLead.phone,
+                email: editingLead.email,
+                source: editingLead.source,
+                status: editingLead.status,
+                notes: editingLead.notes
+            });
 
-            await fetchLeads();
-
-            setOpen(false);
+        } else {
 
             setFormData({
                 name: "",
@@ -41,10 +44,56 @@ export default function AddLeadModal({ open,
                 notes: ""
             });
 
-        } catch (err) {
-            console.error(err);
         }
-    };  
+
+    }, [open, editingLead]);
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSave = async () => {
+
+        try {
+
+            if (editingLead) {
+
+                await api.put(
+                    `/leads/${editingLead.id}`,
+                    formData
+                );
+
+            } else {
+
+                await api.post(
+                    "/leads",
+                    formData
+                );
+
+            }
+
+            await fetchLeads();
+            setFormData({
+                name: "",
+                company: "",
+                phone: "",
+                email: "",
+                source: "",
+                status: "",
+                notes: ""
+            });
+            setOpen(false);
+
+        } catch (err) {
+
+            console.error(err);
+
+        }
+
+    };
     if (!open) return null;
 
     return (
@@ -56,7 +105,7 @@ export default function AddLeadModal({ open,
                 <div className="flex justify-between items-center mb-6">
 
                     <h2 className="text-2xl font-bold">
-                        Add New Lead
+                        {editingLead ? "Edit Lead" : "Add New Lead"}
                     </h2>
 
                     <X
@@ -138,9 +187,9 @@ export default function AddLeadModal({ open,
                
                 <button
                     onClick={handleSave}
-                    className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl"
+                    className="mt-6 bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all duration-200 cursor-pointer text-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg"
                 >
-                    Save Lead
+                    {editingLead ? "Update Lead" : "Save Lead"}
                 </button>
             </div>
 

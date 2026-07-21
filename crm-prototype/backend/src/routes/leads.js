@@ -3,6 +3,7 @@ import db from "../database/db.js";
 import { generateEmail } from "../services/emailService.js";
 import { analyzeLead } from "../services/aiService.js";
 import { generateWhatsApp } from "../services/whatsappService.js";
+import { generateCallScript } from "../services/callScriptService.js";
 const router = express.Router();
 
 // GET ALL LEADS
@@ -184,6 +185,114 @@ router.get("/:id/whatsapp", (req, res) => {
                 });
 
             }
+
+        }
+    );
+
+});
+router.get("/:id/call-script", (req, res) => {
+
+    db.get(
+        "SELECT * FROM leads WHERE id = ?",
+        [req.params.id],
+        async (err, lead) => {
+
+            if (err)
+                return res.status(500).json(err);
+
+            if (!lead)
+                return res.status(404).json({
+                    message: "Lead not found"
+                });
+
+            try {
+
+                const script = await generateCallScript(lead);
+
+                res.json(script);
+
+            } catch (err) {
+
+                console.error(err);
+
+                res.status(500).json({
+                    message: "Call script generation failed"
+                });
+
+            }
+
+        }
+    );
+
+});
+
+router.put("/:id", (req, res) => {
+
+    const {
+        name,
+        company,
+        phone,
+        email,
+        source,
+        status,
+        notes
+    } = req.body;
+
+    db.run(
+        `
+        UPDATE leads
+        SET
+            name = ?,
+            company = ?,
+            phone = ?,
+            email = ?,
+            source = ?,
+            status = ?,
+            notes = ?
+        WHERE id = ?
+        `,
+        [
+            name,
+            company,
+            phone,
+            email,
+            source,
+            status,
+            notes,
+            req.params.id
+        ],
+        function (err) {
+
+            if (err)
+                return res.status(500).json(err);
+
+            res.json({
+                message: "Lead updated successfully"
+            });
+
+        }
+    );
+
+});
+router.delete("/:id", (req, res) => {
+
+    db.run(
+        "DELETE FROM leads WHERE id = ?",
+        [req.params.id],
+        function (err) {
+
+            if (err)
+                return res.status(500).json(err);
+
+            if (this.changes === 0) {
+                return res.status(404).json({
+                    message: "Lead not found"
+                });
+            }
+
+            res.json({
+                message: "Lead deleted successfully"
+            });
 
         }
     );
