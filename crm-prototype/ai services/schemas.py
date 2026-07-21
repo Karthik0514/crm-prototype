@@ -29,3 +29,10 @@ class WhatsAppResponse(BaseModel):
     
 class CallScriptResponse(BaseModel):
     script: str
+    
+class ChatRequest(BaseModel):
+    message: str
+
+
+class ChatResponse(BaseModel):
+    response: str

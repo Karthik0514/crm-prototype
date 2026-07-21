@@ -1,4 +1,10 @@
-export default function AIInsights() {
+export default function AIInsights({
+    interested,
+    followUps,
+    converted,
+    newLeads
+}) {
+
     return (
 
         <div className="bg-white rounded-2xl shadow-sm border p-6">
@@ -12,12 +18,14 @@ export default function AIInsights() {
                 <div className="bg-blue-50 rounded-xl p-4">
 
                     <h3 className="font-semibold">
-                        🔥 Hot Leads
+                        🔥 Priority Leads
                     </h3>
 
                     <p className="text-gray-600 mt-2">
 
-                        5 leads have over 90% buying intent.
+                        {interested === 0
+                            ? "No high-priority leads at the moment."
+                            : `${interested} interested lead${interested !== 1 ? "s are" : " is"} ready for immediate follow-up.`}
 
                     </p>
 
@@ -26,12 +34,14 @@ export default function AIInsights() {
                 <div className="bg-orange-50 rounded-xl p-4">
 
                     <h3 className="font-semibold">
-                        📞 Follow-ups
+                        📞 Follow-up Reminder
                     </h3>
 
                     <p className="text-gray-600 mt-2">
 
-                        3 customers require follow-up today.
+                        {followUps === 0
+                            ? "No pending follow-ups."
+                            : `${followUps} lead${followUps !== 1 ? "s require" : " requires"} your attention today.`}
 
                     </p>
 
@@ -40,12 +50,18 @@ export default function AIInsights() {
                 <div className="bg-green-50 rounded-xl p-4">
 
                     <h3 className="font-semibold">
-                        💰 Potential Revenue
+                        🤖 AI Recommendation
                     </h3>
 
                     <p className="text-gray-600 mt-2">
 
-                        ₹4.25 Lakhs estimated conversion.
+                        {newLeads > interested
+                            ? "Reach out to newly added leads to improve conversion opportunities."
+                            : interested > 0
+                                ? "Focus on interested leads first. They have the highest chance of conversion."
+                                : converted > 0
+                                    ? "Great progress! Keep nurturing new leads to maintain conversions."
+                                    : "Add more leads to start receiving AI recommendations."}
 
                     </p>
 

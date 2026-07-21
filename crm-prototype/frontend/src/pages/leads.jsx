@@ -30,6 +30,19 @@ export default function Leads() {
         );
 
     });
+    const totalLeads = leads.length;
+
+    const newLeads = leads.filter(
+        (lead) => lead.status === "New"
+    ).length;
+
+    const interestedLeads = leads.filter(
+        (lead) => lead.status === "Interested"
+    ).length;
+
+    const followUpLeads = leads.filter(
+        (lead) => lead.status === "Follow Up"
+    ).length;
     return (
         <div>
 
@@ -54,7 +67,57 @@ export default function Leads() {
                     + Add Lead
                 </button>
             </div>
+            <div className="grid grid-cols-4 gap-6 mb-6">
 
+                <div className="bg-white border rounded-2xl p-6 shadow-sm">
+
+                    <p className="text-gray-500">
+                        Total Leads
+                    </p>
+
+                    <h1 className="text-4xl font-bold mt-2">
+                        {totalLeads}
+                    </h1>
+
+                </div>
+
+                <div className="bg-white border rounded-2xl p-6 shadow-sm">
+
+                    <p className="text-gray-500">
+                        New Leads
+                    </p>
+
+                    <h1 className="text-4xl font-bold text-blue-600 mt-2">
+                        {newLeads}
+                    </h1>
+
+                </div>
+
+                <div className="bg-white border rounded-2xl p-6 shadow-sm">
+
+                    <p className="text-gray-500">
+                        Interested
+                    </p>
+
+                    <h1 className="text-4xl font-bold text-green-600 mt-2">
+                        {interestedLeads}
+                    </h1>
+
+                </div>
+
+                <div className="bg-white border rounded-2xl p-6 shadow-sm">
+
+                    <p className="text-gray-500">
+                        Follow Up
+                    </p>
+
+                    <h1 className="text-4xl font-bold text-orange-500 mt-2">
+                        {followUpLeads}
+                    </h1>
+
+                </div>
+
+            </div>
             <div className="bg-white rounded-2xl shadow-sm border p-5 mb-6">
 
                 <div className="flex gap-4">
