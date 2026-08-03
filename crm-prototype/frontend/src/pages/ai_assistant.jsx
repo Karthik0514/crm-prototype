@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api from "../services/api";
+
 export default function AIAssistant() {
 
     const [messages, setMessages] = useState([
@@ -11,12 +12,29 @@ export default function AIAssistant() {
 
     const [input, setInput] = useState("");
 
+    const quickPrompt = (text) => {
+        setInput(text);
+    };
+
     const sendMessage = async () => {
 
         if (!input.trim()) return;
 
         const currentMessage = input;
 
+        // Build the full conversation history
+        const history = [
+            ...messages.map(msg => ({
+                role: msg.sender === "user" ? "user" : "assistant",
+                content: msg.text
+            })),
+            {
+                role: "user",
+                content: currentMessage
+            }
+        ];
+
+        // Show the user's message immediately
         setMessages(prev => [
             ...prev,
             {
@@ -30,7 +48,7 @@ export default function AIAssistant() {
         try {
 
             const response = await api.post("/chat", {
-                message: currentMessage
+                messages: history
             });
 
             setMessages(prev => [
@@ -136,9 +154,7 @@ export default function AIAssistant() {
                 <div className="bg-white rounded-2xl shadow-sm border p-5">
 
                     <h2 className="font-semibold text-lg mb-5">
-
                         AI Tools
-
                     </h2>
 
                     <div className="space-y-3">
@@ -176,9 +192,7 @@ export default function AIAssistant() {
                     <hr className="my-6" />
 
                     <h3 className="font-semibold mb-3">
-
                         Suggested Prompts
-
                     </h3>
 
                     <div className="space-y-2 text-sm">
