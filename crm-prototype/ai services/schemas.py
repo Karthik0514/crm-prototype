@@ -61,14 +61,25 @@ class ChatMessage(BaseModel):
 
 
 class ChatRequest(BaseModel):
+
     messages: List[ChatMessage]
+
     lead: LeadRequest | None = None
 
+    current_lead: str | None = None
+
+    pending_action: str | None = None
 
 
 class ChatResponse(BaseModel):
+
     response: str
-    
+
+    lead_name: str | None = None
+
+    pending_action: str | None = None
+
+
 from typing import Optional
 
 class AgentAction(BaseModel):
