@@ -8,7 +8,7 @@ import {
     CircleCheck,
     MessageSquare,
 } from "lucide-react";
-
+import ConvertSaleModal from "../components/convert_sale_modal";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
@@ -25,6 +25,8 @@ export default function LeadDetails() {
     const [callScript, setCallScript] = useState(null);
     const [loadingCallScript, setLoadingCallScript] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
+    const [convertModalOpen, setConvertModalOpen] =
+        useState(false);
     const generateEmail = async () => {
         try {
             setLoadingEmail(true);
@@ -421,10 +423,28 @@ export default function LeadDetails() {
                 )}
                 <div className="flex gap-4">
 
-                    <button className="bg-green-600 hover:bg-green-700 active:scale-95 transition-all duration-200 cursor-pointer text-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg">
-                        Convert to Sale
-                    </button>
+                    {lead.status !== "Converted" && (
 
+                        <button
+
+                            onClick={() => setConvertModalOpen(true)}
+
+                            className="
+                                bg-green-600
+                                hover:bg-green-700
+                                text-white
+                                px-5
+                                py-3
+                                rounded-xl
+                            "
+
+                        >
+
+                            Convert to Sale
+
+                        </button>
+
+                    )}
                     <button className="bg-gray-800 hover:bg-black active:scale-95 transition-all duration-200 cursor-pointer text-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg">
                         Add Note
                     </button>
@@ -451,6 +471,16 @@ export default function LeadDetails() {
 
             </div>
 
+            <ConvertSaleModal
+                open={convertModalOpen}
+                setOpen={setConvertModalOpen}
+                lead={lead}
+                onSuccess={() => {
+
+                    refreshLead();
+
+                }}
+            />
         </div>
 
     );

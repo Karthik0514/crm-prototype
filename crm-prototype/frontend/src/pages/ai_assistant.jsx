@@ -6,6 +6,7 @@ import ChatWindow from "../components/ai/chat_window";
 import ChatInput from "../components/ai/chat_input";
 import AITools from "../components/ai/ai_tools";
 
+
 export default function AIAssistant() {
 
     const [messages, setMessages] = useState([]);
@@ -81,6 +82,80 @@ export default function AIAssistant() {
 
 
     // ------------------------------------
+    // Delete Chat
+    // ------------------------------------
+
+    const deleteChat = async (sessionId) => {
+
+        try {
+
+            await api.delete(
+
+                `/chat/session/${sessionId}`
+
+            );
+
+
+            // Remove the chat immediately
+            // from the sidebar
+
+            setSessions(previousSessions =>
+
+                previousSessions.filter(
+
+                    session => session.id !== sessionId
+
+                )
+
+            );
+
+
+            // If the deleted chat is the
+            // currently open chat
+
+            if (currentSession === sessionId) {
+
+                setCurrentSession(null);
+
+                setMessages([]);
+
+                setInput("");
+
+            }
+
+
+            console.log(
+
+                "Chat deleted successfully:",
+
+                sessionId
+
+            );
+
+        }
+
+        catch (err) {
+
+            console.error(
+
+                "Failed to delete chat:",
+
+                err
+
+            );
+
+            alert(
+
+                "Could not delete the chat. Please try again."
+
+            );
+
+        }
+
+    };
+
+
+    // ------------------------------------
     // Load Existing Chat
     // ------------------------------------
 
@@ -98,6 +173,7 @@ export default function AIAssistant() {
 
             );
 
+
             const formatted = response.data.map(msg => ({
 
                 sender: msg.sender,
@@ -105,6 +181,7 @@ export default function AIAssistant() {
                 text: msg.message
 
             }));
+
 
             setMessages(formatted);
 
@@ -132,11 +209,18 @@ export default function AIAssistant() {
     const sendMessage = async () => {
 
         if (!input.trim()) return;
+
         const currentMessage = input;
 
         let sessionId = currentSession;
 
+
         try {
+
+            // --------------------------------
+            // Create chat automatically
+            // if one doesn't exist
+            // --------------------------------
 
             if (!sessionId) {
 
@@ -146,11 +230,15 @@ export default function AIAssistant() {
 
                 );
 
+
                 sessionId = newChat.data.id;
 
                 setCurrentSession(sessionId);
 
                 await loadSessions();
+
+
+                // Generate chat title
 
                 await api.post(
 
@@ -166,20 +254,27 @@ export default function AIAssistant() {
 
                 );
 
+
                 await loadSessions();
 
             }
 
-           
+
+            // --------------------------------
+            // Build conversation history
+            // --------------------------------
+
             const history = [
 
                 ...messages.map(msg => ({
 
-                    role: msg.sender === "user"
+                    role:
 
-                        ? "user"
+                        msg.sender === "user"
 
-                        : "assistant",
+                            ? "user"
+
+                            : "assistant",
 
                     content: msg.text
 
@@ -195,6 +290,11 @@ export default function AIAssistant() {
 
             ];
 
+
+            // --------------------------------
+            // Show user message immediately
+            // --------------------------------
+
             setMessages(prev => [
 
                 ...prev,
@@ -209,7 +309,13 @@ export default function AIAssistant() {
 
             ]);
 
+
             setInput("");
+
+
+            // --------------------------------
+            // Save user message
+            // --------------------------------
 
             await api.post(
 
@@ -227,13 +333,18 @@ export default function AIAssistant() {
 
             );
 
+
+            // --------------------------------
+            // Send message to AI
+            // --------------------------------
+
             const response = await api.post(
 
                 "/chat",
 
                 {
-                    sessionId,
 
+                    sessionId,
 
                     messages: history
 
@@ -241,27 +352,53 @@ export default function AIAssistant() {
 
             );
 
+
             const aiResponse = response.data.response;
+
+
+            // --------------------------------
+            // Update title if needed
+            // --------------------------------
+
             const currentChat = sessions.find(
+
                 s => s.id === sessionId
+
             );
 
+
             if (
+
                 currentChat &&
+
                 currentChat.title === "New Chat"
+
             ) {
 
-                await api.post("/chat/title", {
+                await api.post(
 
-                    id: sessionId,
+                    "/chat/title",
 
-                    message: currentMessage
+                    {
 
-                });
+                        id: sessionId,
+
+                        message: currentMessage
+
+                    }
+
+                );
+
 
                 await loadSessions();
 
             }
+
+
+            // --------------------------------
+            // Show AI response
+            // --------------------------------
+
             setMessages(prev => [
 
                 ...prev,
@@ -275,6 +412,11 @@ export default function AIAssistant() {
                 }
 
             ]);
+
+
+            // --------------------------------
+            // Save AI response
+            // --------------------------------
 
             await api.post(
 
@@ -297,6 +439,7 @@ export default function AIAssistant() {
         catch (err) {
 
             console.error(err);
+
 
             setMessages(prev => [
 
@@ -327,6 +470,7 @@ export default function AIAssistant() {
 
     }, []);
 
+
     return (
 
         <div>
@@ -337,13 +481,16 @@ export default function AIAssistant() {
 
             </h1>
 
+
             <p className="text-gray-500 mt-2">
 
                 AI-powered CRM assistant with persistent conversations.
 
             </p>
 
+
             <div className="grid grid-cols-12 gap-6 mt-8 h-[750px]">
+
 
                 {/* ===================================== */}
                 {/* LEFT SIDEBAR */}
@@ -361,9 +508,12 @@ export default function AIAssistant() {
 
                         setCurrentSession={loadChat}
 
+                        deleteChat={deleteChat}
+
                     />
 
                 </div>
+
 
                 {/* ===================================== */}
                 {/* CHAT */}
@@ -371,27 +521,32 @@ export default function AIAssistant() {
 
                 <div className="col-span-6 bg-white rounded-2xl shadow-sm border flex flex-col">
 
-                    {loading ? (
+                    {
 
-                        <div className="flex-1 flex items-center justify-center">
+                        loading ? (
 
-                            <div className="text-gray-500">
+                            <div className="flex-1 flex items-center justify-center">
 
-                                Loading conversation...
+                                <div className="text-gray-500">
+
+                                    Loading conversation...
+
+                                </div>
 
                             </div>
 
-                        </div>
+                        ) : (
 
-                    ) : (
+                            <ChatWindow
 
-                        <ChatWindow
+                                messages={messages}
 
-                            messages={messages}
+                            />
 
-                        />
+                        )
 
-                    )}
+                    }
+
 
                     <ChatInput
 
@@ -405,6 +560,7 @@ export default function AIAssistant() {
 
                 </div>
 
+
                 {/* ===================================== */}
                 {/* AI TOOLS */}
                 {/* ===================================== */}
@@ -417,6 +573,7 @@ export default function AIAssistant() {
 
                     />
 
+
                     <div className="bg-white rounded-2xl border shadow-sm p-5 mt-6">
 
                         <h2 className="font-semibold mb-4">
@@ -425,11 +582,17 @@ export default function AIAssistant() {
 
                         </h2>
 
+
                         <div className="space-y-3 text-sm">
+
 
                             <button
 
-                                onClick={() => quickPrompt("Summarize today's leads.")}
+                                onClick={() =>
+                                    quickPrompt(
+                                        "Summarize today's leads."
+                                    )
+                                }
 
                                 className="w-full text-left hover:text-blue-600"
 
@@ -439,9 +602,14 @@ export default function AIAssistant() {
 
                             </button>
 
+
                             <button
 
-                                onClick={() => quickPrompt("Show all interested leads.")}
+                                onClick={() =>
+                                    quickPrompt(
+                                        "Show all interested leads."
+                                    )
+                                }
 
                                 className="w-full text-left hover:text-blue-600"
 
@@ -451,9 +619,14 @@ export default function AIAssistant() {
 
                             </button>
 
+
                             <button
 
-                                onClick={() => quickPrompt("Generate follow-up email.")}
+                                onClick={() =>
+                                    quickPrompt(
+                                        "Generate follow-up email."
+                                    )
+                                }
 
                                 className="w-full text-left hover:text-blue-600"
 
@@ -463,9 +636,14 @@ export default function AIAssistant() {
 
                             </button>
 
+
                             <button
 
-                                onClick={() => quickPrompt("Generate WhatsApp follow-up.")}
+                                onClick={() =>
+                                    quickPrompt(
+                                        "Generate WhatsApp follow-up."
+                                    )
+                                }
 
                                 className="w-full text-left hover:text-blue-600"
 
@@ -475,9 +653,14 @@ export default function AIAssistant() {
 
                             </button>
 
+
                             <button
 
-                                onClick={() => quickPrompt("Create sales call script.")}
+                                onClick={() =>
+                                    quickPrompt(
+                                        "Create sales call script."
+                                    )
+                                }
 
                                 className="w-full text-left hover:text-blue-600"
 

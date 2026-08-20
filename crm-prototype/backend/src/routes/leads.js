@@ -1,25 +1,55 @@
 import express from "express";
 import db from "../database/db.js";
+
 import { generateEmail } from "../services/emailService.js";
 import { analyzeLead } from "../services/aiService.js";
 import { generateWhatsApp } from "../services/whatsappService.js";
 import { generateCallScript } from "../services/callScriptService.js";
+
 const router = express.Router();
 
+
+// =========================================
+// JSON BODY PARSER
+// =========================================
+
+router.use(express.json());
+
+
+// =========================================
 // GET ALL LEADS
+// =========================================
+
 router.get("/", (req, res) => {
 
-    db.all("SELECT * FROM leads", [], (err, rows) => {
+    db.all(
+        "SELECT * FROM leads",
+        [],
+        (err, rows) => {
 
-        if (err) return res.status(500).json(err);
+            if (err) {
 
-        res.json(rows);
+                console.error(
+                    "❌ Error getting leads:",
+                    err.message
+                );
 
-    });
+                return res.status(500).json(err);
+
+            }
+
+            res.json(rows);
+
+        }
+    );
 
 });
 
+
+// =========================================
 // GET ONE LEAD
+// =========================================
+
 router.get("/:id", (req, res) => {
 
     db.get(
@@ -27,13 +57,24 @@ router.get("/:id", (req, res) => {
         [req.params.id],
         (err, row) => {
 
-            if (err)
+            if (err) {
+
+                console.error(
+                    "❌ Error getting lead:",
+                    err.message
+                );
+
                 return res.status(500).json(err);
 
-            if (!row)
+            }
+
+            if (!row) {
+
                 return res.status(404).json({
                     message: "Lead not found"
                 });
+
+            }
 
             res.json(row);
 
@@ -42,30 +83,46 @@ router.get("/:id", (req, res) => {
 
 });
 
+
+// =========================================
+// AI ANALYZE LEAD
+// =========================================
+
 router.get("/:id/analyze", (req, res) => {
 
     db.get(
         "SELECT * FROM leads WHERE id = ?",
         [req.params.id],
+
         async (err, row) => {
 
-            if (err)
+            if (err) {
+
                 return res.status(500).json(err);
 
-            if (!row)
+            }
+
+            if (!row) {
+
                 return res.status(404).json({
                     message: "Lead not found"
                 });
 
+            }
+
             try {
 
-                const analysis = await analyzeLead(row);
+                const analysis =
+                    await analyzeLead(row);
 
                 res.json(analysis);
 
             } catch (err) {
 
-                console.error(err);
+                console.error(
+                    "❌ AI analysis error:",
+                    err
+                );
 
                 res.status(500).json({
                     message: "AI analysis failed"
@@ -78,7 +135,11 @@ router.get("/:id/analyze", (req, res) => {
 
 });
 
+
+// =========================================
 // CREATE LEAD
+// =========================================
+
 router.post("/", (req, res) => {
 
     const {
@@ -91,10 +152,22 @@ router.post("/", (req, res) => {
         notes
     } = req.body;
 
+
     db.run(
-        `INSERT INTO leads
-        (name, company, phone, email, source, status, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `
+        INSERT INTO leads
+        (
+            name,
+            company,
+            phone,
+            email,
+            source,
+            status,
+            notes
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        `,
+
         [
             name,
             company,
@@ -104,14 +177,26 @@ router.post("/", (req, res) => {
             status,
             notes
         ],
+
         function (err) {
 
-            if (err)
+            if (err) {
+
+                console.error(
+                    "❌ Error creating lead:",
+                    err.message
+                );
+
                 return res.status(500).json(err);
 
+            }
+
             res.json({
+
                 message: "Lead Created",
+
                 id: this.lastID
+
             });
 
         }
@@ -119,33 +204,50 @@ router.post("/", (req, res) => {
 
 });
 
+
+// =========================================
+// GENERATE EMAIL
+// =========================================
+
 router.get("/:id/email", (req, res) => {
 
     db.get(
         "SELECT * FROM leads WHERE id = ?",
         [req.params.id],
+
         async (err, lead) => {
 
-            if (err)
+            if (err) {
+
                 return res.status(500).json(err);
 
-            if (!lead)
+            }
+
+            if (!lead) {
+
                 return res.status(404).json({
                     message: "Lead not found"
                 });
 
+            }
+
             try {
 
-                const email = await generateEmail(lead);
+                const email =
+                    await generateEmail(lead);
 
                 res.json(email);
 
             } catch (err) {
 
-                console.error(err);
+                console.error(
+                    "❌ Email generation error:",
+                    err
+                );
 
                 res.status(500).json({
-                    message: "Failed to generate email"
+                    message:
+                        "Failed to generate email"
                 });
 
             }
@@ -154,34 +256,51 @@ router.get("/:id/email", (req, res) => {
     );
 
 });
+
+
+// =========================================
+// GENERATE WHATSAPP MESSAGE
+// =========================================
 
 router.get("/:id/whatsapp", (req, res) => {
 
     db.get(
         "SELECT * FROM leads WHERE id = ?",
         [req.params.id],
+
         async (err, lead) => {
 
-            if (err)
+            if (err) {
+
                 return res.status(500).json(err);
 
-            if (!lead)
+            }
+
+            if (!lead) {
+
                 return res.status(404).json({
                     message: "Lead not found"
                 });
 
+            }
+
             try {
 
-                const whatsapp = await generateWhatsApp(lead);
+                const whatsapp =
+                    await generateWhatsApp(lead);
 
                 res.json(whatsapp);
 
             } catch (err) {
 
-                console.error(err);
+                console.error(
+                    "❌ WhatsApp generation error:",
+                    err
+                );
 
                 res.status(500).json({
-                    message: "WhatsApp generation failed"
+                    message:
+                        "WhatsApp generation failed"
                 });
 
             }
@@ -190,33 +309,51 @@ router.get("/:id/whatsapp", (req, res) => {
     );
 
 });
+
+
+// =========================================
+// GENERATE CALL SCRIPT
+// =========================================
+
 router.get("/:id/call-script", (req, res) => {
 
     db.get(
         "SELECT * FROM leads WHERE id = ?",
         [req.params.id],
+
         async (err, lead) => {
 
-            if (err)
+            if (err) {
+
                 return res.status(500).json(err);
 
-            if (!lead)
+            }
+
+            if (!lead) {
+
                 return res.status(404).json({
                     message: "Lead not found"
                 });
 
+            }
+
             try {
 
-                const script = await generateCallScript(lead);
+                const script =
+                    await generateCallScript(lead);
 
                 res.json(script);
 
             } catch (err) {
 
-                console.error(err);
+                console.error(
+                    "❌ Call script error:",
+                    err
+                );
 
                 res.status(500).json({
-                    message: "Call script generation failed"
+                    message:
+                        "Call script generation failed"
                 });
 
             }
@@ -225,6 +362,177 @@ router.get("/:id/call-script", (req, res) => {
     );
 
 });
+
+
+// =========================================
+// CONVERT LEAD TO SALE
+// =========================================
+
+router.post("/:id/convert", (req, res) => {
+
+    const { id } = req.params;
+
+    console.log("Convert request received:");
+    console.log("Lead ID:", id);
+    console.log("Request body:", req.body);
+
+    const {
+        amount,
+        payment_due_date,
+        payment_notes
+    } = req.body;
+
+    const saleAmount = Number(amount);
+
+    if (
+        !saleAmount ||
+        Number.isNaN(saleAmount) ||
+        saleAmount <= 0
+    ) {
+
+        return res.status(400).json({
+            message: "A valid sale amount is required."
+        });
+
+    }
+
+    db.get(
+        "SELECT * FROM leads WHERE id = ?",
+        [id],
+        (err, lead) => {
+
+            if (err) {
+
+                console.error(
+                    "Error finding lead:",
+                    err.message
+                );
+
+                return res.status(500).json({
+                    message: "Database error."
+                });
+
+            }
+
+            if (!lead) {
+
+                return res.status(404).json({
+                    message: "Lead not found."
+                });
+
+            }
+
+            if (lead.status === "Converted") {
+
+                return res.status(400).json({
+                    message: "Lead is already converted."
+                });
+
+            }
+
+            db.run(
+
+                `
+                INSERT INTO sales (
+                    lead_id,
+                    customer_name,
+                    company,
+                    source,
+                    sale_amount,
+                    amount_paid,
+                    payment_status,
+                    payment_due_date,
+                    payment_notes
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `,
+
+                [
+                    lead.id,
+                    lead.name,
+                    lead.company,
+                    lead.source,
+                    saleAmount,
+                    0,
+                    "Pending",
+                    payment_due_date || null,
+                    payment_notes || null
+                ],
+
+                function (err) {
+
+                    if (err) {
+
+                        console.error(
+                            "Error creating sale:",
+                            err.message
+                        );
+
+                        return res.status(500).json({
+                            message: "Failed to create sale."
+                        });
+
+                    }
+
+                    db.run(
+
+                        `
+                        UPDATE leads
+                        SET status = ?
+                        WHERE id = ?
+                        `,
+
+                        [
+                            "Converted",
+                            lead.id
+                        ],
+
+                        (err) => {
+
+                            if (err) {
+
+                                console.error(
+                                    "Error updating lead:",
+                                    err.message
+                                );
+
+                                return res.status(500).json({
+                                    message: "Sale created but failed to update lead."
+                                });
+
+                            }
+
+                            console.log(
+                                "Sale created successfully. Sale ID:",
+                                this.lastID
+                            );
+
+                            res.status(201).json({
+
+                                message:
+                                    "Lead converted to sale successfully.",
+
+                                sale_id:
+                                    this.lastID
+
+                            });
+
+                        }
+
+                    );
+
+                }
+
+            );
+
+        }
+
+    );
+
+});
+// =========================================
+// UPDATE LEAD
+// =========================================
 
 router.put("/:id", (req, res) => {
 
@@ -238,9 +546,12 @@ router.put("/:id", (req, res) => {
         notes
     } = req.body;
 
+
     db.run(
+
         `
         UPDATE leads
+
         SET
             name = ?,
             company = ?,
@@ -249,8 +560,10 @@ router.put("/:id", (req, res) => {
             source = ?,
             status = ?,
             notes = ?
+
         WHERE id = ?
         `,
+
         [
             name,
             company,
@@ -261,41 +574,93 @@ router.put("/:id", (req, res) => {
             notes,
             req.params.id
         ],
+
         function (err) {
 
-            if (err)
+            if (err) {
+
+                console.error(
+                    "❌ Error updating lead:",
+                    err.message
+                );
+
                 return res.status(500).json(err);
 
-            res.json({
-                message: "Lead updated successfully"
-            });
-
-        }
-    );
-
-});
-router.delete("/:id", (req, res) => {
-
-    db.run(
-        "DELETE FROM leads WHERE id = ?",
-        [req.params.id],
-        function (err) {
-
-            if (err)
-                return res.status(500).json(err);
+            }
 
             if (this.changes === 0) {
+
                 return res.status(404).json({
-                    message: "Lead not found"
+
+                    message:
+                        "Lead not found"
+
                 });
+
             }
 
             res.json({
-                message: "Lead deleted successfully"
+
+                message:
+                    "Lead updated successfully"
+
             });
 
         }
+
     );
 
 });
+
+
+// =========================================
+// DELETE LEAD
+// =========================================
+
+router.delete("/:id", (req, res) => {
+
+    db.run(
+
+        "DELETE FROM leads WHERE id = ?",
+
+        [req.params.id],
+
+        function (err) {
+
+            if (err) {
+
+                console.error(
+                    "❌ Error deleting lead:",
+                    err.message
+                );
+
+                return res.status(500).json(err);
+
+            }
+
+            if (this.changes === 0) {
+
+                return res.status(404).json({
+
+                    message:
+                        "Lead not found"
+
+                });
+
+            }
+
+            res.json({
+
+                message:
+                    "Lead deleted successfully"
+
+            });
+
+        }
+
+    );
+
+});
+
+
 export default router;
