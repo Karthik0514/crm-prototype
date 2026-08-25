@@ -11,90 +11,69 @@ const router = express.Router();
 router.get("/", (req, res) => {
 
     db.all(
-
         `
         SELECT *
         FROM notifications
-        ORDER BY
-            is_read ASC,
-            created_at DESC
+        ORDER BY created_at DESC, id DESC
         LIMIT 50
         `,
-
         [],
-
         (err, notifications) => {
 
             if (err) {
 
                 console.error(
-                    "❌ Failed to fetch notifications:",
-                    err
+                    "❌ Error getting notifications:",
+                    err.message
                 );
 
                 return res.status(500).json({
-
-                    message:
-                        "Failed to fetch notifications"
-
+                    message: "Failed to get notifications"
                 });
 
             }
 
-
             res.json(notifications);
 
         }
-
     );
 
 });
 
 
 // ==========================================
-// GET UNREAD COUNT
+// MARK ALL NOTIFICATIONS AS READ
+// IMPORTANT: PUT THIS BEFORE /:id/read
 // ==========================================
 
-router.get("/unread/count", (req, res) => {
+router.put("/read/all", (req, res) => {
 
-    db.get(
-
+    db.run(
         `
-        SELECT COUNT(*) AS count
-        FROM notifications
-        WHERE is_read = 0
+        UPDATE notifications
+        SET is_read = 1
         `,
-
         [],
-
-        (err, result) => {
+        (err) => {
 
             if (err) {
 
                 console.error(
-                    "❌ Failed to count notifications:",
-                    err
+                    "❌ Error marking notifications as read:",
+                    err.message
                 );
 
                 return res.status(500).json({
-
-                    message:
-                        "Failed to count notifications"
-
+                    message: "Failed to update notifications"
                 });
 
             }
 
-
             res.json({
-
-                count:
-                    result.count
-
+                message: "All notifications marked as read"
             });
 
         }
-
     );
 
 });
@@ -107,15 +86,11 @@ router.get("/unread/count", (req, res) => {
 router.put("/:id/read", (req, res) => {
 
     db.run(
-
         `
         UPDATE notifications
-
         SET is_read = 1
-
         WHERE id = ?
         `,
-
         [req.params.id],
 
         function (err) {
@@ -123,80 +98,29 @@ router.put("/:id/read", (req, res) => {
             if (err) {
 
                 console.error(
-                    "❌ Failed to update notification:",
-                    err
+                    "❌ Error updating notification:",
+                    err.message
                 );
 
                 return res.status(500).json({
-
-                    message:
-                        "Failed to update notification"
-
+                    message: "Failed to update notification"
                 });
 
             }
 
+            if (this.changes === 0) {
 
-            res.json({
-
-                message:
-                    "Notification marked as read"
-
-            });
-
-        }
-
-    );
-
-});
-
-
-// ==========================================
-// MARK ALL AS READ
-// ==========================================
-
-router.put("/read/all", (req, res) => {
-
-    db.run(
-
-        `
-        UPDATE notifications
-
-        SET is_read = 1
-
-        WHERE is_read = 0
-        `,
-
-        [],
-
-        function (err) {
-
-            if (err) {
-
-                console.error(
-                    "❌ Failed to update notifications:",
-                    err
-                );
-
-                return res.status(500).json({
-
-                    message:
-                        "Failed to update notifications"
-
+                return res.status(404).json({
+                    message: "Notification not found"
                 });
 
             }
 
-
             res.json({
-
-                message:
-                    "All notifications marked as read"
-
+                message: "Notification marked as read"
             });
 
         }
-
     );
 
 });
@@ -209,12 +133,10 @@ router.put("/read/all", (req, res) => {
 router.delete("/:id", (req, res) => {
 
     db.run(
-
         `
         DELETE FROM notifications
         WHERE id = ?
         `,
-
         [req.params.id],
 
         function (err) {
@@ -222,29 +144,29 @@ router.delete("/:id", (req, res) => {
             if (err) {
 
                 console.error(
-                    "❌ Failed to delete notification:",
-                    err
+                    "❌ Error deleting notification:",
+                    err.message
                 );
 
                 return res.status(500).json({
-
-                    message:
-                        "Failed to delete notification"
-
+                    message: "Failed to delete notification"
                 });
 
             }
 
+            if (this.changes === 0) {
+
+                return res.status(404).json({
+                    message: "Notification not found"
+                });
+
+            }
 
             res.json({
-
-                message:
-                    "Notification deleted"
-
+                message: "Notification deleted"
             });
 
         }
-
     );
 
 });

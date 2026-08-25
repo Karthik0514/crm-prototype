@@ -191,13 +191,61 @@ router.post("/", (req, res) => {
 
             }
 
-            res.json({
+            const newLeadId = this.lastID;
 
-                message: "Lead Created",
 
-                id: this.lastID
+            // ==========================================
+            // CREATE NOTIFICATION
+            // ==========================================
 
-            });
+            db.run(
+
+                `
+    INSERT INTO notifications
+    (
+        title,
+        message,
+        type
+    )
+
+    VALUES (?, ?, ?)
+    `,
+
+                [
+
+                    "New Lead",
+
+                    `${name} has been added as a new lead.`,
+
+                    "new_lead"
+
+                ],
+
+                (notificationError) => {
+
+                    if (notificationError) {
+
+                        console.error(
+                            "❌ Failed to create notification:",
+                            notificationError.message
+                        );
+
+                    }
+
+
+                    res.status(201).json({
+
+                        message:
+                            "Lead Created",
+
+                        id:
+                            newLeadId
+
+                    });
+
+                }
+
+            );
 
         }
     );
@@ -507,15 +555,61 @@ router.post("/:id/convert", (req, res) => {
                                 this.lastID
                             );
 
-                            res.status(201).json({
+                            const saleId = this.lastID;
 
-                                message:
-                                    "Lead converted to sale successfully.",
 
-                                sale_id:
-                                    this.lastID
+                            // ==========================================
+                            // CREATE SALE NOTIFICATION
+                            // ==========================================
 
-                            });
+                            db.run(
+
+                                `
+    INSERT INTO notifications
+    (
+        title,
+        message,
+        type
+    )
+
+    VALUES (?, ?, ?)
+    `,
+
+                                [
+
+                                    "Lead Converted 🎉",
+
+                                    `${lead.name} has been converted into a sale.`,
+
+                                    "converted"
+
+                                ],
+
+                                (notificationError) => {
+
+                                    if (notificationError) {
+
+                                        console.error(
+                                            "❌ Failed to create conversion notification:",
+                                            notificationError.message
+                                        );
+
+                                    }
+
+
+                                    res.status(201).json({
+
+                                        message:
+                                            "Lead converted to sale successfully.",
+
+                                        sale_id:
+                                            saleId
+
+                                    });
+
+                                }
+
+                            );
 
                         }
 
