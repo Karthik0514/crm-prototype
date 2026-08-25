@@ -6,9 +6,12 @@ import aiTools from "./routes/aiTools.js";
 import leadRoutes from "./routes/leads.js";
 import chatRoutes from "./routes/chat.js";
 import salesRoutes from "./routes/sales.js";
-import "dotenv/config";
-import authRoutes from "./routes/auth.js";
 import notificationRoutes from "./routes/notifications.js";
+import authRoutes from "./routes/auth.js";
+
+import authenticateToken from "./middleware/auth.js";
+
+import "dotenv/config";
 import "./database/initDB.js";
 
 
@@ -17,8 +20,13 @@ const app = express();
 
 app.use(cors());
 
+
 app.use(express.json());
 
+
+// ==========================================
+// ROOT
+// ==========================================
 
 app.get("/", (req, res) => {
 
@@ -27,18 +35,87 @@ app.get("/", (req, res) => {
 });
 
 
-app.use("/api/leads", leadRoutes);
-
-app.use("/api/chat", chatRoutes);
-
-app.use("/api/ai", aiRoutes);
-
-app.use("/api/tools", aiTools);
-
-app.use("/api/sales", salesRoutes);
+// ==========================================
+// PUBLIC AUTH ROUTES
+// ==========================================
 
 app.use("/api/auth", authRoutes);
-app.use("/api/notifications", notificationRoutes);
+
+
+// ==========================================
+// PROTECTED CRM ROUTES
+// ==========================================
+
+app.use(
+
+    "/api/leads",
+
+    authenticateToken,
+
+    leadRoutes
+
+);
+
+
+app.use(
+
+    "/api/chat",
+
+    authenticateToken,
+
+    chatRoutes
+
+);
+
+
+app.use(
+
+    "/api/ai",
+
+    authenticateToken,
+
+    aiRoutes
+
+);
+
+
+app.use(
+
+    "/api/tools",
+
+    authenticateToken,
+
+    aiTools
+
+);
+
+
+app.use(
+
+    "/api/sales",
+
+    authenticateToken,
+
+    salesRoutes
+
+);
+
+
+app.use(
+
+    "/api/notifications",
+
+    authenticateToken,
+
+    notificationRoutes
+
+);
+
+
+// ==========================================
+// START SERVER
+// ==========================================
+
 app.listen(5000, () => {
 
     console.log(

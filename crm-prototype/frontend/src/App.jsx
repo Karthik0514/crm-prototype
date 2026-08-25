@@ -13,17 +13,11 @@ import Profile from "./pages/profile";
 import DashboardLayout from "./layouts/dashboard_layout";
 import ProtectedRoute from "./components/protected_route";
 
-
 function App() {
-
   return (
-
     <Routes>
 
-
-      {/* ========================================= */}
-      {/* LOGIN */}
-      {/* ========================================= */}
+      {/* PUBLIC ROUTE */}
 
       <Route
         path="/"
@@ -31,78 +25,60 @@ function App() {
       />
 
 
-      {/* ========================================= */}
-      {/* PROTECTED CRM ROUTES */}
-      {/* ========================================= */}
+      {/* PROTECTED ROUTES */}
 
       <Route
         element={
-
           <ProtectedRoute>
-
             <DashboardLayout />
-
           </ProtectedRoute>
-
         }
       >
-
 
         <Route
           path="/dashboard"
           element={<Dashboard />}
         />
 
-
         <Route
           path="/leads"
           element={<Leads />}
         />
-
 
         <Route
           path="/lead/:id"
           element={<LeadDetails />}
         />
 
-
         <Route
           path="/employees"
           element={<Employees />}
         />
-
 
         <Route
           path="/campaigns"
           element={<Campaigns />}
         />
 
-
         <Route
           path="/sales"
           element={<Sales />}
         />
-
 
         <Route
           path="/ai"
           element={<AIAssistant />}
         />
 
-
         <Route
           path="/profile"
           element={<Profile />}
         />
 
-
       </Route>
 
-
     </Routes>
-
   );
-
 }
 
 export default App;
