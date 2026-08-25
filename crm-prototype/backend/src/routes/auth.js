@@ -22,9 +22,7 @@ router.post("/register", async (req, res) => {
     } = req.body;
 
 
-    // -----------------------------------------
     // VALIDATION
-    // -----------------------------------------
 
     if (
 
@@ -46,9 +44,7 @@ router.post("/register", async (req, res) => {
 
     try {
 
-        // -----------------------------------------
         // CHECK IF USER EXISTS
-        // -----------------------------------------
 
         db.get(
 
@@ -90,9 +86,7 @@ router.post("/register", async (req, res) => {
 
                 try {
 
-                    // -----------------------------------------
                     // HASH PASSWORD
-                    // -----------------------------------------
 
                     const hashedPassword =
                         await bcrypt.hash(
@@ -101,9 +95,7 @@ router.post("/register", async (req, res) => {
                         );
 
 
-                    // -----------------------------------------
                     // CREATE USER
-                    // -----------------------------------------
 
                     db.run(
 
@@ -121,9 +113,9 @@ router.post("/register", async (req, res) => {
 
                         [
 
-                            name,
-                            email,
-                            phone || null,
+                            name.trim(),
+                            email.trim(),
+                            phone?.trim() || null,
                             hashedPassword
 
                         ],
@@ -154,12 +146,14 @@ router.post("/register", async (req, res) => {
                                     id:
                                         this.lastID,
 
-                                    name,
+                                    name:
+                                        name.trim(),
 
-                                    email,
+                                    email:
+                                        email.trim(),
 
                                     phone:
-                                        phone || null
+                                        phone?.trim() || null
 
                                 }
 
@@ -241,7 +235,7 @@ router.post("/login", async (req, res) => {
         WHERE email = ?
         `,
 
-        [email],
+        [email.trim()],
 
         async (err, user) => {
 
@@ -273,9 +267,7 @@ router.post("/login", async (req, res) => {
 
             try {
 
-                // -----------------------------------------
                 // CHECK PASSWORD
-                // -----------------------------------------
 
                 const passwordMatches =
                     await bcrypt.compare(
@@ -299,9 +291,7 @@ router.post("/login", async (req, res) => {
                 }
 
 
-                // -----------------------------------------
                 // CREATE TOKEN
-                // -----------------------------------------
 
                 const token =
                     jwt.sign(
@@ -328,9 +318,7 @@ router.post("/login", async (req, res) => {
                     );
 
 
-                // -----------------------------------------
                 // SEND RESPONSE
-                // -----------------------------------------
 
                 res.json({
 
@@ -373,6 +361,449 @@ router.post("/login", async (req, res) => {
         }
 
     );
+
+});
+
+
+// ==================================================
+// UPDATE PROFILE
+// ==================================================
+
+router.put("/profile", (req, res) => {
+
+    const {
+
+        name,
+        phone
+
+    } = req.body;
+
+
+    const authHeader =
+        req.headers.authorization;
+
+
+    // CHECK TOKEN
+
+    if (
+
+        !authHeader ||
+        !authHeader.startsWith("Bearer ")
+
+    ) {
+
+        return res.status(401).json({
+
+            message:
+                "Authentication token required"
+
+        });
+
+    }
+
+
+    const token =
+        authHeader.split(" ")[1];
+
+
+    try {
+
+        const decoded =
+            jwt.verify(
+
+                token,
+
+                process.env.JWT_SECRET
+
+            );
+
+
+        // VALIDATE NAME
+
+        if (
+
+            !name ||
+            !name.trim()
+
+        ) {
+
+            return res.status(400).json({
+
+                message:
+                    "Name is required"
+
+            });
+
+        }
+
+
+        // UPDATE USER
+
+        db.run(
+
+            `
+            UPDATE users
+
+            SET
+
+                name = ?,
+
+                phone = ?
+
+            WHERE id = ?
+            `,
+
+            [
+
+                name.trim(),
+
+                phone?.trim() || null,
+
+                decoded.id
+
+            ],
+
+            function (err) {
+
+                if (err) {
+
+                    console.error(err);
+
+                    return res.status(500).json({
+
+                        message:
+                            "Failed to update profile"
+
+                    });
+
+                }
+
+
+                if (this.changes === 0) {
+
+                    return res.status(404).json({
+
+                        message:
+                            "User not found"
+
+                    });
+
+                }
+
+
+                // FETCH UPDATED USER
+
+                db.get(
+
+                    `
+                    SELECT
+
+                        id,
+
+                        name,
+
+                        email,
+
+                        phone
+
+                    FROM users
+
+                    WHERE id = ?
+                    `,
+
+                    [decoded.id],
+
+                    (err, user) => {
+
+                        if (err) {
+
+                            console.error(err);
+
+                            return res.status(500).json({
+
+                                message:
+                                    "Failed to fetch updated profile"
+
+                            });
+
+                        }
+
+
+                        res.json({
+
+                            message:
+                                "Profile updated successfully",
+
+                            user
+
+                        });
+
+                    }
+
+                );
+
+            }
+
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(401).json({
+
+            message:
+                "Invalid or expired token"
+
+        });
+
+    }
+
+});
+
+
+// ==================================================
+// CHANGE PASSWORD
+// ==================================================
+
+router.put("/change-password", (req, res) => {
+
+    const {
+
+        currentPassword,
+        newPassword
+
+    } = req.body;
+
+
+    const authHeader =
+        req.headers.authorization;
+
+
+    // CHECK TOKEN
+
+    if (
+
+        !authHeader ||
+        !authHeader.startsWith("Bearer ")
+
+    ) {
+
+        return res.status(401).json({
+
+            message:
+                "Authentication token required"
+
+        });
+
+    }
+
+
+    // VALIDATE INPUT
+
+    if (
+
+        !currentPassword ||
+        !newPassword
+
+    ) {
+
+        return res.status(400).json({
+
+            message:
+                "Current password and new password are required"
+
+        });
+
+    }
+
+
+    if (
+
+        newPassword.length < 6
+
+    ) {
+
+        return res.status(400).json({
+
+            message:
+                "New password must be at least 6 characters"
+
+        });
+
+    }
+
+
+    const token =
+        authHeader.split(" ")[1];
+
+
+    try {
+
+        const decoded =
+            jwt.verify(
+
+                token,
+
+                process.env.JWT_SECRET
+
+            );
+
+
+        // GET USER
+
+        db.get(
+
+            `
+            SELECT *
+            FROM users
+            WHERE id = ?
+            `,
+
+            [decoded.id],
+
+            async (err, user) => {
+
+                if (err) {
+
+                    console.error(err);
+
+                    return res.status(500).json({
+
+                        message:
+                            "Database error"
+
+                    });
+
+                }
+
+
+                if (!user) {
+
+                    return res.status(404).json({
+
+                        message:
+                            "User not found"
+
+                    });
+
+                }
+
+
+                try {
+
+                    // VERIFY CURRENT PASSWORD
+
+                    const passwordMatches =
+                        await bcrypt.compare(
+
+                            currentPassword,
+
+                            user.password
+
+                        );
+
+
+                    if (!passwordMatches) {
+
+                        return res.status(401).json({
+
+                            message:
+                                "Current password is incorrect"
+
+                        });
+
+                    }
+
+
+                    // HASH NEW PASSWORD
+
+                    const hashedPassword =
+                        await bcrypt.hash(
+
+                            newPassword,
+
+                            10
+
+                        );
+
+
+                    // UPDATE PASSWORD
+
+                    db.run(
+
+                        `
+                        UPDATE users
+
+                        SET password = ?
+
+                        WHERE id = ?
+                        `,
+
+                        [
+
+                            hashedPassword,
+
+                            decoded.id
+
+                        ],
+
+                        function (err) {
+
+                            if (err) {
+
+                                console.error(err);
+
+                                return res.status(500).json({
+
+                                    message:
+                                        "Failed to change password"
+
+                                });
+
+                            }
+
+
+                            res.json({
+
+                                message:
+                                    "Password changed successfully"
+
+                            });
+
+                        }
+
+                    );
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    return res.status(500).json({
+
+                        message:
+                            "Password processing failed"
+
+                    });
+
+                }
+
+            }
+
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(401).json({
+
+            message:
+                "Invalid or expired token"
+
+        });
+
+    }
 
 });
 

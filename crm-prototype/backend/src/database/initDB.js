@@ -339,4 +339,45 @@ db.serialize(() => {
         }
     );
 
+    // ==========================================
+    // NOTIFICATIONS TABLE
+    // ==========================================
+
+    db.run(`
+    CREATE TABLE IF NOT EXISTS notifications (
+
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        type TEXT NOT NULL,
+
+        title TEXT NOT NULL,
+
+        message TEXT NOT NULL,
+
+        related_id INTEGER,
+
+        is_read INTEGER DEFAULT 0,
+
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
+    )
+`, (err) => {
+
+        if (err) {
+
+            console.error(
+                "❌ Failed to create Notifications table:",
+                err
+            );
+
+        } else {
+
+            console.log(
+                "✅ Notifications table ready"
+            );
+
+        }
+
+    });
+
 });

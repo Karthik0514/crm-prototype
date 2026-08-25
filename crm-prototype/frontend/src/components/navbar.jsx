@@ -1,8 +1,15 @@
-import { Bell, Search } from "lucide-react";
+import { Bell, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+
+    const navigate = useNavigate();
+
     return (
+
         <header className="bg-white h-20 border-b px-8 flex items-center justify-between">
+
+            {/* Page Title */}
 
             <div>
 
@@ -16,21 +23,25 @@ export default function Navbar() {
 
             </div>
 
+
+            {/* Right Side */}
+
             <div className="flex items-center gap-5">
 
-                <div className="relative">
+                {/* Profile */}
 
-                    <Search
-                        size={18}
-                        className="absolute left-3 top-3 text-gray-400"
-                    />
+                <button
+                    onClick={() => navigate("/profile")}
+                    className="p-2 rounded-full hover:bg-gray-100 transition"
+                    title="Profile"
+                >
 
-                    <input
-                        placeholder="Search..."
-                        className="pl-10 pr-4 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                    <User size={24} />
 
-                </div>
+                </button>
+
+
+                {/* Notifications */}
 
                 <Bell
                     className="cursor-pointer"
@@ -40,5 +51,7 @@ export default function Navbar() {
             </div>
 
         </header>
+
     );
+
 }

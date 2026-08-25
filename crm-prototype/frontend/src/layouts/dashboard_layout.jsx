@@ -3,7 +3,9 @@ import Navbar from "../components/Navbar";
 import { Outlet } from "react-router-dom";
 
 export default function DashboardLayout() {
+
     return (
+
         <div className="flex h-screen">
 
             <Sidebar />
@@ -13,11 +15,15 @@ export default function DashboardLayout() {
                 <Navbar />
 
                 <main className="p-6 bg-slate-100 flex-1 overflow-y-auto">
+
                     <Outlet />
+
                 </main>
 
             </div>
 
         </div>
+
     );
+
 }
