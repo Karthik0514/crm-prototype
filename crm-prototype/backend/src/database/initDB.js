@@ -297,4 +297,46 @@ db.serialize(() => {
 
     });
 
+    // -----------------------------------------
+    // USERS
+    // -----------------------------------------
+
+    db.run(
+        `
+    CREATE TABLE IF NOT EXISTS users (
+
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        name TEXT NOT NULL,
+
+        email TEXT NOT NULL UNIQUE,
+
+        phone TEXT,
+
+        password TEXT NOT NULL,
+
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
+    )
+    `,
+        (err) => {
+
+            if (err) {
+
+                console.error(
+                    "❌ Error creating users table:",
+                    err.message
+                );
+
+            } else {
+
+                console.log(
+                    "✅ Users table ready"
+                );
+
+            }
+
+        }
+    );
+
 });

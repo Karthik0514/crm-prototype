@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/login";
 import Dashboard from "./pages/dashboard";
@@ -11,30 +11,117 @@ import LeadDetails from "./pages/lead_details";
 
 import DashboardLayout from "./layouts/dashboard_layout";
 
+
+// ==================================================
+// PROTECTED ROUTE
+// ==================================================
+
+function ProtectedRoute({ children }) {
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+
+    return <Navigate to="/" replace />;
+
+  }
+
+  return children;
+
+}
+
+
+// ==================================================
+// APP
+// ==================================================
+
 function App() {
+
   return (
+
     <Routes>
 
-      <Route path="/" element={<Login />} />
 
-      <Route element={<DashboardLayout />}>
+      {/* LOGIN */}
 
-        <Route path="/dashboard" element={<Dashboard />} />
+      <Route
+        path="/"
+        element={<Login />}
+      />
 
-        <Route path="/leads" element={<Leads />} />
-        <Route path="/lead/:id" element={<LeadDetails />} />
-        <Route path="/employees" element={<Employees />} />
 
-        <Route path="/campaigns" element={<Campaigns />} />
+      {/* PROTECTED DASHBOARD ROUTES */}
 
-        <Route path="/sales" element={<Sales />} />
+      <Route
+        element={
 
-        <Route path="/ai" element={<AIAssistant />} />
+          <ProtectedRoute>
+
+            <DashboardLayout />
+
+          </ProtectedRoute>
+
+        }
+      >
+
+
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+
+        <Route
+          path="/leads"
+          element={<Leads />}
+        />
+
+
+        <Route
+          path="/lead/:id"
+          element={<LeadDetails />}
+        />
+
+
+        <Route
+          path="/employees"
+          element={<Employees />}
+        />
+
+
+        <Route
+          path="/campaigns"
+          element={<Campaigns />}
+        />
+
+
+        <Route
+          path="/sales"
+          element={<Sales />}
+        />
+
+
+        <Route
+          path="/ai"
+          element={<AIAssistant />}
+        />
+
 
       </Route>
 
+
+      {/* UNKNOWN ROUTES */}
+
+      <Route
+        path="*"
+        element={<Navigate to="/" replace />}
+      />
+
+
     </Routes>
+
   );
+
 }
 
 export default App;

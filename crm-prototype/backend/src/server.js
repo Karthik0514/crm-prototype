@@ -6,7 +6,8 @@ import aiTools from "./routes/aiTools.js";
 import leadRoutes from "./routes/leads.js";
 import chatRoutes from "./routes/chat.js";
 import salesRoutes from "./routes/sales.js";
-
+import "dotenv/config";
+import authRoutes from "./routes/auth.js";
 import "./database/initDB.js";
 
 
@@ -35,7 +36,7 @@ app.use("/api/tools", aiTools);
 
 app.use("/api/sales", salesRoutes);
 
-
+app.use("/api/auth", authRoutes);
 app.listen(5000, () => {
 
     console.log(
