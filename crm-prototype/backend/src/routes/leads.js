@@ -641,48 +641,40 @@ router.put("/:id", (req, res) => {
     } = req.body;
 
 
-    db.run(
+    // =========================================
+    // GET CURRENT LEAD FIRST
+    // =========================================
+
+    db.get(
 
         `
-        UPDATE leads
-
-        SET
-            name = ?,
-            company = ?,
-            phone = ?,
-            email = ?,
-            source = ?,
-            status = ?,
-            notes = ?
-
+        SELECT *
+        FROM leads
         WHERE id = ?
         `,
 
-        [
-            name,
-            company,
-            phone,
-            email,
-            source,
-            status,
-            notes,
-            req.params.id
-        ],
+        [req.params.id],
 
-        function (err) {
+        (getError, existingLead) => {
 
-            if (err) {
+            if (getError) {
 
                 console.error(
-                    "❌ Error updating lead:",
-                    err.message
+                    "❌ Error getting lead before update:",
+                    getError.message
                 );
 
-                return res.status(500).json(err);
+                return res.status(500).json({
+
+                    message:
+                        "Failed to get lead"
+
+                });
 
             }
 
-            if (this.changes === 0) {
+
+            if (!existingLead) {
 
                 return res.status(404).json({
 
@@ -693,19 +685,146 @@ router.put("/:id", (req, res) => {
 
             }
 
-            res.json({
 
-                message:
-                    "Lead updated successfully"
+            // Save the old status before updating
 
-            });
+            const oldStatus =
+                existingLead.status;
+
+
+            // =========================================
+            // UPDATE LEAD
+            // =========================================
+
+            db.run(
+
+                `
+                UPDATE leads
+
+                SET
+                    name = ?,
+                    company = ?,
+                    phone = ?,
+                    email = ?,
+                    source = ?,
+                    status = ?,
+                    notes = ?
+
+                WHERE id = ?
+                `,
+
+                [
+                    name,
+                    company,
+                    phone,
+                    email,
+                    source,
+                    status,
+                    notes,
+                    req.params.id
+                ],
+
+                function (updateError) {
+
+                    if (updateError) {
+
+                        console.error(
+                            "❌ Error updating lead:",
+                            updateError.message
+                        );
+
+                        return res.status(500).json({
+
+                            message:
+                                "Failed to update lead"
+
+                        });
+
+                    }
+
+
+                    // =========================================
+                    // CHECK IF STATUS ACTUALLY CHANGED
+                    // =========================================
+
+                    const statusChanged =
+                        oldStatus !== status;
+
+
+                    if (!statusChanged) {
+
+                        return res.json({
+
+                            message:
+                                "Lead updated successfully"
+
+                        });
+
+                    }
+
+
+                    // =========================================
+                    // CREATE STATUS CHANGE NOTIFICATION
+                    // =========================================
+
+                    db.run(
+
+                        `
+                        INSERT INTO notifications
+                        (
+                            title,
+                            message,
+                            type
+                        )
+
+                        VALUES (?, ?, ?)
+                        `,
+
+                        [
+
+                            "Lead Status Updated",
+
+                            `${name || existingLead.name}'s status changed from ${oldStatus} to ${status}.`,
+
+                            "status_change"
+
+                        ],
+
+                        (notificationError) => {
+
+                            if (notificationError) {
+
+                                console.error(
+                                    "❌ Failed to create status notification:",
+                                    notificationError.message
+                                );
+
+                                // The lead update still worked,
+                                // so we return success.
+
+                            }
+
+
+                            res.json({
+
+                                message:
+                                    "Lead updated successfully"
+
+                            });
+
+                        }
+
+                    );
+
+                }
+
+            );
 
         }
 
     );
 
 });
-
 
 // =========================================
 // DELETE LEAD
