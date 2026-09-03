@@ -264,6 +264,7 @@ export default function LeadTable({
                                             <button
                                                 onClick={() => navigate(`/lead/${lead.id}`)}
                                                 className="
+                                                    cursor-pointer
                                                     flex
                                                     items-center
                                                     gap-3
@@ -453,6 +454,7 @@ export default function LeadTable({
                                                 <button
                                                     onClick={() => navigate(`/lead/${lead.id}`)}
                                                     className="
+                                                        cursor-pointer
                                                         inline-flex
                                                         h-9
                                                         w-9
@@ -478,6 +480,7 @@ export default function LeadTable({
                                                     <button
                                                         onClick={() => openConvertModal(lead)}
                                                         className="
+                                                        cursor-pointer
                                                             inline-flex
                                                             h-9
                                                             items-center
@@ -540,7 +543,7 @@ export default function LeadTable({
 
                                     <button
                                         onClick={() => navigate(`/lead/${lead.id}`)}
-                                        className="flex min-w-0 items-center gap-3 text-left"
+                                        className="cursor-pointer flex min-w-0 items-center gap-3 text-left"
                                     >
 
                                         <div className={`
@@ -627,6 +630,7 @@ export default function LeadTable({
                                     <button
                                         onClick={() => navigate(`/lead/${lead.id}`)}
                                         className="
+                                            cursor-pointer
                                             inline-flex
                                             flex-1
                                             items-center
@@ -653,6 +657,7 @@ export default function LeadTable({
                                         <button
                                             onClick={() => openConvertModal(lead)}
                                             className="
+                                                cursor-pointer
                                                 inline-flex
                                                 flex-1
                                                 items-center
@@ -786,6 +791,7 @@ export default function LeadTable({
                                 onClick={closeConvertModal}
                                 disabled={loading}
                                 className="
+                                    cursor-pointer
                                     flex
                                     h-9
                                     w-9
@@ -931,6 +937,7 @@ export default function LeadTable({
                                 onClick={closeConvertModal}
                                 disabled={loading}
                                 className="
+                                    cursor-pointer
                                     rounded-xl
                                     border
                                     border-slate-200
@@ -953,6 +960,7 @@ export default function LeadTable({
                                 onClick={convertToSale}
                                 disabled={loading}
                                 className="
+                                    cursor-pointer
                                     inline-flex
                                     items-center
                                     gap-2

@@ -1,3 +1,4 @@
+
 import {
     ArrowUp,
     Paperclip,
@@ -23,6 +24,33 @@ export default function ChatInput({
             sendMessage();
 
         }
+
+    };
+
+
+    // Open the computer's file picker
+    const handleAttachmentClick = () => {
+
+        document
+            .getElementById("chat-file-upload")
+            ?.click();
+
+    };
+
+
+    // Handle selected file
+    const handleFileChange = (event) => {
+
+        const file = event.target.files?.[0];
+
+        if (!file) return;
+
+        console.log("Selected file:", file);
+
+        // TODO:
+        // Upload/process the file here.
+        // For now, the file is selected from the computer
+        // and available through this variable.
 
     };
 
@@ -76,29 +104,45 @@ export default function ChatInput({
 
                 {/* BOTTOM CONTROLS */}
 
-                <div className="
-                    flex
-                    items-center
-                    justify-between
-                    gap-3
-                    px-1
-                    pb-1
-                ">
-
-                    <div className="
+                <div
+                    className="
                         flex
                         items-center
-                        gap-1
-                    ">
+                        justify-between
+                        gap-3
+                        px-1
+                        pb-1
+                    "
+                >
+
+                    <div
+                        className="
+                            flex
+                            items-center
+                            gap-1
+                        "
+                    >
+
+                        {/* HIDDEN FILE INPUT */}
+
+                        <input
+                            id="chat-file-upload"
+                            type="file"
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
+
 
                         {/* ATTACHMENT */}
 
                         <button
                             type="button"
+                            onClick={handleAttachmentClick}
                             className="
                                 flex
                                 h-8
                                 w-8
+                                cursor-pointer
                                 items-center
                                 justify-center
                                 rounded-xl
@@ -106,27 +150,32 @@ export default function ChatInput({
                                 transition
                                 hover:bg-white
                                 hover:text-slate-600
+                                active:scale-95
                             "
-                            title="Attach"
+                            title="Attach a file"
                         >
+
                             <Paperclip size={16} />
+
                         </button>
 
 
                         {/* AI STATUS */}
 
-                        <div className="
-                            hidden
-                            items-center
-                            gap-1.5
-                            rounded-xl
-                            px-2
-                            py-1.5
-                            text-[10px]
-                            font-medium
-                            text-slate-400
-                            sm:flex
-                        ">
+                        <div
+                            className="
+                                hidden
+                                items-center
+                                gap-1.5
+                                rounded-xl
+                                px-2
+                                py-1.5
+                                text-[10px]
+                                font-medium
+                                text-slate-400
+                                sm:flex
+                            "
+                        >
 
                             <Sparkles
                                 size={12}
@@ -151,6 +200,7 @@ export default function ChatInput({
                             h-9
                             w-9
                             shrink-0
+                            cursor-pointer
                             items-center
                             justify-center
                             rounded-xl
@@ -161,6 +211,7 @@ export default function ChatInput({
                             transition
                             duration-150
                             hover:bg-blue-700
+                            active:scale-95
                             disabled:cursor-not-allowed
                             disabled:bg-slate-200
                             disabled:text-slate-400
@@ -183,15 +234,18 @@ export default function ChatInput({
 
             {/* HINT */}
 
-            <p className="
-                mt-2
-                text-center
-                text-[10px]
-                text-slate-400
-            ">
+            <p
+                className="
+                    mt-2
+                    text-center
+                    text-[10px]
+                    text-slate-400
+                "
+            >
                 Enter to send · Shift + Enter for a new line
             </p>
 
         </div>
     );
 }
+

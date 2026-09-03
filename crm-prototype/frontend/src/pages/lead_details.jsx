@@ -503,6 +503,7 @@ export default function LeadDetails() {
                             navigate("/leads")
                         }
                         className="
+                            cursor-pointer
                             mt-5
                             inline-flex
                             items-center
@@ -514,8 +515,13 @@ export default function LeadDetails() {
                             text-white
                             text-sm
                             font-medium
+                            shadow-sm
+                            transition-all
+                            duration-200
                             hover:bg-blue-700
-                            transition
+                            hover:shadow-md
+                            hover:-translate-y-0.5
+                            active:scale-[0.98]
                         "
                     >
                         <ArrowLeft size={16} />
@@ -559,13 +565,13 @@ export default function LeadDetails() {
 
                     <button
                         onClick={() => navigate("/leads")}
-                        className="group inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition mb-6"
+                        className="cursor-pointer group inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-all duration-200 mb-6"
                     >
-                        <ArrowLeft size={17} className="group-hover:-translate-x-0.5 transition" />
+                        <ArrowLeft size={17} className="group-hover:-translate-x-1 transition-transform duration-200" />
                         Back to Leads
                     </button>
 
-                    <section className="relative overflow-hidden bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                    <section className="relative overflow-hidden bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]">
                         <div className="absolute right-0 top-0 w-72 h-72 bg-emerald-50 rounded-full -translate-y-1/2 translate-x-1/2" />
                         <div className="relative p-7 lg:p-8">
                             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
@@ -581,7 +587,7 @@ export default function LeadDetails() {
                                             </h1>
 
                                             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 text-xs font-semibold">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                                 Converted Customer
                                             </span>
                                         </div>
@@ -611,7 +617,7 @@ export default function LeadDetails() {
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => setEditOpen(true)}
-                                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition"
+                                        className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 hover:border-slate-300 hover:-translate-y-0.5 active:scale-[0.98]"
                                     >
                                         <Pencil size={15} />
                                         Edit Customer
@@ -667,7 +673,7 @@ export default function LeadDetails() {
 
                         <div className="lg:col-span-2 space-y-6">
 
-                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]">
                                 <div className="p-6">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
@@ -680,21 +686,21 @@ export default function LeadDetails() {
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                                        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5">
+                                        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5 transition-colors duration-200 hover:bg-slate-100/70">
                                             <p className="text-xs font-medium text-slate-500">Sale Amount</p>
                                             <p className="text-2xl font-bold text-slate-950 mt-2">
                                                 {sale ? `₹${saleAmount.toLocaleString("en-IN")}` : "—"}
                                             </p>
                                         </div>
 
-                                        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5">
+                                        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5 transition-colors duration-200 hover:bg-slate-100/70">
                                             <p className="text-xs font-medium text-slate-500">Amount Paid</p>
                                             <p className="text-2xl font-bold text-emerald-600 mt-2">
                                                 {sale ? `₹${amountPaid.toLocaleString("en-IN")}` : "—"}
                                             </p>
                                         </div>
 
-                                        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5">
+                                        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5 transition-colors duration-200 hover:bg-slate-100/70">
                                             <p className="text-xs font-medium text-slate-500">Outstanding</p>
                                             <p className={`text-2xl font-bold mt-2 ${outstanding > 0 ? "text-amber-600" : "text-emerald-600"}`}>
                                                 {sale ? `₹${outstanding.toLocaleString("en-IN")}` : "—"}
@@ -740,7 +746,7 @@ export default function LeadDetails() {
                                 </div>
                             </section>
 
-                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]">
                                 <div className="p-6">
                                     <div className="flex items-center justify-between gap-4">
                                         <div className="flex items-center gap-3">
@@ -755,7 +761,7 @@ export default function LeadDetails() {
 
                                         <button
                                             onClick={() => { setNoteText(""); setNoteOpen(true); }}
-                                            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition"
+                                            className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:-translate-y-0.5 active:scale-[0.98]"
                                         >
                                             <Plus size={14} />
                                             Add Note
@@ -779,7 +785,7 @@ export default function LeadDetails() {
                                 </div>
                             </section>
 
-                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]">
                                 <div className="p-6">
                                     <div className="flex items-center gap-3 mb-7">
                                         <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
@@ -813,7 +819,7 @@ export default function LeadDetails() {
                         </div>
 
                         <div className="space-y-6">
-                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]">
                                 <div className="p-6">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
@@ -852,7 +858,7 @@ export default function LeadDetails() {
                                 </div>
                             </section>
 
-                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)] transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]">
                                 <div className="p-6">
                                     <div className="flex items-center gap-3 mb-5">
                                         <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
@@ -866,7 +872,7 @@ export default function LeadDetails() {
 
                                     <button
                                         onClick={() => navigate("/sales")}
-                                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition"
+                                        className="cursor-pointer w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-600 text-white text-sm font-semibold shadow-sm transition-all duration-200 hover:bg-emerald-700 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
                                     >
                                         <CreditCard size={16} />
                                         View Sales
@@ -875,7 +881,7 @@ export default function LeadDetails() {
 
                                     <button
                                         onClick={() => { setNoteText(""); setNoteOpen(true); }}
-                                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition mt-3"
+                                        className="cursor-pointer w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold transition-all duration-200 hover:bg-slate-50 hover:-translate-y-0.5 active:scale-[0.98] mt-3"
                                     >
                                         <FileText size={16} />
                                         Add Customer Note
@@ -883,7 +889,7 @@ export default function LeadDetails() {
 
                                     <button
                                         onClick={() => setEditOpen(true)}
-                                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition mt-3"
+                                        className="cursor-pointer w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold transition-all duration-200 hover:bg-slate-50 hover:-translate-y-0.5 active:scale-[0.98] mt-3"
                                     >
                                         <Pencil size={16} />
                                         Edit Customer
@@ -891,11 +897,11 @@ export default function LeadDetails() {
                                 </div>
                             </section>
 
-                            <section className="bg-white border border-red-100 rounded-3xl">
+                            <section className="bg-white border border-red-100 rounded-3xl transition-shadow duration-300 hover:shadow-md">
                                 <div className="p-5">
                                     <button
                                         onClick={() => setDeleteModalOpen(true)}
-                                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-600 text-sm font-semibold hover:bg-red-50 transition"
+                                        className="cursor-pointer w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-600 text-sm font-semibold transition-all duration-200 hover:bg-red-50 active:scale-[0.98]"
                                     >
                                         <Trash2 size={16} />
                                         Delete Customer Record
@@ -920,21 +926,21 @@ export default function LeadDetails() {
                             <div className="flex items-center gap-2 flex-wrap">
                                 <button
                                     onClick={() => { setNoteText(""); setNoteOpen(true); }}
-                                    className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                                    className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-50 active:scale-[0.98]"
                                 >
                                     <FileText size={15} />
                                     Add Note
                                 </button>
                                 <button
                                     onClick={() => setEditOpen(true)}
-                                    className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                                    className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-50 active:scale-[0.98]"
                                 >
                                     <Pencil size={15} />
                                     Edit
                                 </button>
                                 <button
                                     onClick={() => navigate("/sales")}
-                                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition"
+                                    className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold shadow-sm transition-all duration-200 hover:bg-emerald-700 hover:shadow-md active:scale-[0.98]"
                                 >
                                     <CreditCard size={15} />
                                     View Sale
@@ -970,7 +976,7 @@ export default function LeadDetails() {
                                         <p className="text-xs text-slate-400">{lead.name}</p>
                                     </div>
                                 </div>
-                                <button onClick={() => setNoteOpen(false)} className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition">
+                                <button onClick={() => setNoteOpen(false)} className="cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 transition-colors duration-200 hover:bg-slate-100 hover:text-slate-700">
                                     <X size={18} />
                                 </button>
                             </div>
@@ -982,21 +988,21 @@ export default function LeadDetails() {
                                     placeholder="Write an internal note about this customer..."
                                     rows={6}
                                     autoFocus
-                                    className="w-full resize-none bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                                    className="w-full resize-none bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 outline-none transition-colors duration-200 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
                                 />
                             </div>
 
                             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
                                 <button
                                     onClick={() => { setNoteText(""); setNoteOpen(false); }}
-                                    className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                    className="cursor-pointer px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-50"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={saveNote}
                                     disabled={savingNote || !noteText.trim()}
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="cursor-pointer inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold transition-all duration-200 hover:bg-blue-700 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 disabled:active:scale-100"
                                 >
                                     <Check size={15} />
                                     {savingNote ? "Saving..." : "Save Note"}
@@ -1020,7 +1026,7 @@ export default function LeadDetails() {
                                     <div className="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center">
                                         <Trash2 size={19} className="text-red-600" />
                                     </div>
-                                    <button onClick={() => setDeleteModalOpen(false)} className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-50">
+                                    <button onClick={() => setDeleteModalOpen(false)} className="cursor-pointer w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 transition-colors duration-200 hover:bg-slate-50">
                                         <X size={18} />
                                     </button>
                                 </div>
@@ -1029,10 +1035,10 @@ export default function LeadDetails() {
                                     You're about to permanently delete <span className="font-semibold text-slate-700">{lead.name}</span>. This action cannot be undone.
                                 </p>
                                 <div className="flex justify-end gap-2 mt-7">
-                                    <button onClick={() => setDeleteModalOpen(false)} className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50">
+                                    <button onClick={() => setDeleteModalOpen(false)} className="cursor-pointer px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-50">
                                         Cancel
                                     </button>
-                                    <button onClick={deleteLead} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700">
+                                    <button onClick={deleteLead} className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold transition-all duration-200 hover:bg-red-700 active:scale-[0.98]">
                                         <Trash2 size={15} />
                                         Delete Customer
                                     </button>
@@ -1084,6 +1090,7 @@ export default function LeadDetails() {
                         navigate("/leads")
                     }
                     className="
+                        cursor-pointer
                         group
                         inline-flex
                         items-center
@@ -1092,7 +1099,8 @@ export default function LeadDetails() {
                         font-medium
                         text-slate-500
                         hover:text-slate-900
-                        transition
+                        transition-all
+                        duration-200
                         mb-6
                     "
                 >
@@ -1100,8 +1108,9 @@ export default function LeadDetails() {
                     <ArrowLeft
                         size={17}
                         className="
-                            group-hover:-translate-x-0.5
-                            transition
+                            group-hover:-translate-x-1
+                            transition-transform
+                            duration-200
                         "
                     />
 
@@ -1123,6 +1132,9 @@ export default function LeadDetails() {
                         border-slate-200
                         rounded-3xl
                         shadow-[0_8px_30px_rgba(15,23,42,0.04)]
+                        transition-shadow
+                        duration-300
+                        hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]
                     "
                 >
 
@@ -1243,6 +1255,7 @@ export default function LeadDetails() {
                                         setEditOpen(true)
                                     }
                                     className="
+                                        cursor-pointer
                                         inline-flex
                                         items-center
                                         gap-2
@@ -1255,9 +1268,13 @@ export default function LeadDetails() {
                                         text-sm
                                         font-medium
                                         text-slate-700
+                                        shadow-sm
+                                        transition-all
+                                        duration-200
                                         hover:bg-slate-50
                                         hover:border-slate-300
-                                        transition
+                                        hover:-translate-y-0.5
+                                        active:scale-[0.98]
                                     "
                                 >
 
@@ -1277,6 +1294,7 @@ export default function LeadDetails() {
                                             )
                                         }
                                         className="
+                                            cursor-pointer
                                             w-10
                                             h-10
                                             rounded-xl
@@ -1287,9 +1305,11 @@ export default function LeadDetails() {
                                             items-center
                                             justify-center
                                             text-slate-500
+                                            transition-all
+                                            duration-200
                                             hover:bg-slate-50
                                             hover:text-slate-900
-                                            transition
+                                            active:scale-[0.95]
                                         "
                                         aria-label="More actions"
                                     >
@@ -1306,7 +1326,7 @@ export default function LeadDetails() {
                                         <>
 
                                             <button
-                                                className="fixed inset-0 z-10 cursor-default"
+                                                className="cursor-default fixed inset-0 z-10"
                                                 onClick={() =>
                                                     setMenuOpen(false)
                                                 }
@@ -1335,6 +1355,7 @@ export default function LeadDetails() {
                                                         setEditOpen(true);
                                                     }}
                                                     className="
+                                                        cursor-pointer
                                                         w-full
                                                         flex
                                                         items-center
@@ -1344,6 +1365,8 @@ export default function LeadDetails() {
                                                         rounded-lg
                                                         text-sm
                                                         text-slate-700
+                                                        transition-colors
+                                                        duration-150
                                                         hover:bg-slate-50
                                                         text-left
                                                     "
@@ -1365,6 +1388,7 @@ export default function LeadDetails() {
                                                         setDeleteModalOpen(true);
                                                     }}
                                                     className="
+                                                        cursor-pointer
                                                         w-full
                                                         flex
                                                         items-center
@@ -1374,6 +1398,8 @@ export default function LeadDetails() {
                                                         rounded-lg
                                                         text-sm
                                                         text-red-600
+                                                        transition-colors
+                                                        duration-150
                                                         hover:bg-red-50
                                                         text-left
                                                     "
@@ -1588,6 +1614,9 @@ export default function LeadDetails() {
                                 border-slate-200
                                 rounded-3xl
                                 shadow-[0_8px_30px_rgba(15,23,42,0.04)]
+                                transition-shadow
+                                duration-300
+                                hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]
                                 overflow-hidden
                             "
                         >
@@ -1648,7 +1677,7 @@ export default function LeadDetails() {
                                         "
                                     >
 
-                                        <Zap size={12} />
+                                        <Zap size={12} className="animate-pulse" />
 
                                         AI Analysis
 
@@ -1677,6 +1706,9 @@ export default function LeadDetails() {
                                             border
                                             border-slate-100
                                             p-5
+                                            transition-colors
+                                            duration-200
+                                            hover:bg-slate-100/70
                                         "
                                     >
 
@@ -1720,10 +1752,13 @@ export default function LeadDetails() {
                                             <div
                                                 className="
                                                     h-full
-                                                    bg-blue-600
+                                                    bg-gradient-to-r
+                                                    from-blue-500
+                                                    to-indigo-500
                                                     rounded-full
                                                     transition-all
-                                                    duration-500
+                                                    duration-700
+                                                    ease-out
                                                 "
                                                 style={{
                                                     width: `${scoreWidth}%`,
@@ -1743,6 +1778,9 @@ export default function LeadDetails() {
                                             border
                                             border-slate-100
                                             p-5
+                                            transition-colors
+                                            duration-200
+                                            hover:bg-slate-50/70
                                         "
                                     >
 
@@ -1782,6 +1820,9 @@ export default function LeadDetails() {
                                             border
                                             border-slate-100
                                             p-5
+                                            transition-colors
+                                            duration-200
+                                            hover:bg-slate-50/70
                                         "
                                     >
 
@@ -1866,6 +1907,9 @@ export default function LeadDetails() {
                                 border-slate-200
                                 rounded-3xl
                                 shadow-[0_8px_30px_rgba(15,23,42,0.04)]
+                                transition-shadow
+                                duration-300
+                                hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]
                             "
                         >
 
@@ -1906,6 +1950,7 @@ export default function LeadDetails() {
                                             )
                                         }
                                         className="
+                                            cursor-pointer
                                             inline-flex
                                             items-center
                                             gap-2
@@ -1916,8 +1961,11 @@ export default function LeadDetails() {
                                             text-white
                                             text-xs
                                             font-semibold
+                                            transition-all
+                                            duration-200
                                             hover:bg-slate-800
-                                            transition
+                                            hover:-translate-y-0.5
+                                            active:scale-[0.98]
                                         "
                                     >
 
@@ -1973,6 +2021,8 @@ export default function LeadDetails() {
                                                 text-slate-800
                                                 placeholder:text-slate-400
                                                 outline-none
+                                                transition-colors
+                                                duration-200
                                                 focus:border-blue-500
                                                 focus:ring-4
                                                 focus:ring-blue-50
@@ -1987,14 +2037,16 @@ export default function LeadDetails() {
                                                     setNoteOpen(false);
                                                 }}
                                                 className="
+                                                    cursor-pointer
                                                     px-4
                                                     py-2.5
                                                     rounded-xl
                                                     text-sm
                                                     font-medium
                                                     text-slate-600
+                                                    transition-colors
+                                                    duration-200
                                                     hover:bg-white
-                                                    transition
                                                 "
                                             >
                                                 Cancel
@@ -2007,6 +2059,7 @@ export default function LeadDetails() {
                                                     !noteText.trim()
                                                 }
                                                 className="
+                                                    cursor-pointer
                                                     inline-flex
                                                     items-center
                                                     gap-2
@@ -2017,10 +2070,13 @@ export default function LeadDetails() {
                                                     text-white
                                                     text-sm
                                                     font-semibold
+                                                    transition-all
+                                                    duration-200
                                                     hover:bg-blue-700
+                                                    active:scale-[0.98]
                                                     disabled:opacity-50
                                                     disabled:cursor-not-allowed
-                                                    transition
+                                                    disabled:active:scale-100
                                                 "
                                             >
 
@@ -2131,6 +2187,9 @@ export default function LeadDetails() {
                                     border-slate-200
                                     rounded-3xl
                                     shadow-[0_8px_30px_rgba(15,23,42,0.04)]
+                                    transition-shadow
+                                    duration-300
+                                    hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]
                                     overflow-hidden
                                 "
                                 >
@@ -2169,7 +2228,7 @@ export default function LeadDetails() {
 
                                         {emailData && (
 
-                                            <div className="rounded-2xl border border-slate-200 overflow-hidden">
+                                            <div className="rounded-2xl border border-slate-200 overflow-hidden transition-shadow duration-200 hover:shadow-sm">
 
                                                 <div className="px-5 py-4 bg-slate-50 border-b border-slate-100 flex items-center gap-3">
 
@@ -2215,7 +2274,7 @@ export default function LeadDetails() {
 
                                         {whatsAppData && (
 
-                                            <div className="rounded-2xl border border-emerald-200 overflow-hidden">
+                                            <div className="rounded-2xl border border-emerald-200 overflow-hidden transition-shadow duration-200 hover:shadow-sm">
 
                                                 <div className="px-5 py-4 bg-emerald-50/70 border-b border-emerald-100 flex items-center gap-3">
 
@@ -2253,7 +2312,7 @@ export default function LeadDetails() {
 
                                         {callScript && (
 
-                                            <div className="rounded-2xl border border-violet-200 overflow-hidden">
+                                            <div className="rounded-2xl border border-violet-200 overflow-hidden transition-shadow duration-200 hover:shadow-sm">
 
                                                 <div className="px-5 py-4 bg-violet-50/70 border-b border-violet-100 flex items-center gap-3">
 
@@ -2315,6 +2374,9 @@ export default function LeadDetails() {
                                 border-slate-200
                                 rounded-3xl
                                 shadow-[0_8px_30px_rgba(15,23,42,0.04)]
+                                transition-shadow
+                                duration-300
+                                hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]
                             "
                         >
 
@@ -2452,6 +2514,9 @@ export default function LeadDetails() {
                                 border-slate-200
                                 rounded-3xl
                                 shadow-[0_8px_30px_rgba(15,23,42,0.04)]
+                                transition-shadow
+                                duration-300
+                                hover:shadow-[0_12px_40px_rgba(15,23,42,0.07)]
                             "
                         >
 
@@ -2489,6 +2554,7 @@ export default function LeadDetails() {
                                         onClick={generateEmail}
                                         disabled={loadingEmail}
                                         className="
+                                            cursor-pointer
                                             w-full
                                             flex
                                             items-center
@@ -2503,11 +2569,15 @@ export default function LeadDetails() {
                                             text-sm
                                             font-medium
                                             text-slate-700
+                                            transition-all
+                                            duration-200
                                             hover:border-blue-200
                                             hover:bg-blue-50/50
                                             hover:text-blue-700
-                                            transition
+                                            active:scale-[0.98]
                                             disabled:opacity-60
+                                            disabled:cursor-not-allowed
+                                            disabled:active:scale-100
                                         "
                                     >
 
@@ -2526,7 +2596,7 @@ export default function LeadDetails() {
 
                                         <ArrowUpRight
                                             size={15}
-                                            className="text-slate-300"
+                                            className="text-slate-300 transition-transform duration-200 group-hover:translate-x-0.5"
                                         />
 
                                     </button>
@@ -2536,6 +2606,7 @@ export default function LeadDetails() {
                                         onClick={generateWhatsApp}
                                         disabled={loadingWhatsApp}
                                         className="
+                                            cursor-pointer
                                             w-full
                                             flex
                                             items-center
@@ -2550,11 +2621,15 @@ export default function LeadDetails() {
                                             text-sm
                                             font-medium
                                             text-slate-700
+                                            transition-all
+                                            duration-200
                                             hover:border-emerald-200
                                             hover:bg-emerald-50/50
                                             hover:text-emerald-700
-                                            transition
+                                            active:scale-[0.98]
                                             disabled:opacity-60
+                                            disabled:cursor-not-allowed
+                                            disabled:active:scale-100
                                         "
                                     >
 
@@ -2583,6 +2658,7 @@ export default function LeadDetails() {
                                         onClick={generateCallScript}
                                         disabled={loadingCallScript}
                                         className="
+                                            cursor-pointer
                                             w-full
                                             flex
                                             items-center
@@ -2597,11 +2673,15 @@ export default function LeadDetails() {
                                             text-sm
                                             font-medium
                                             text-slate-700
+                                            transition-all
+                                            duration-200
                                             hover:border-violet-200
                                             hover:bg-violet-50/50
                                             hover:text-violet-700
-                                            transition
+                                            active:scale-[0.98]
                                             disabled:opacity-60
+                                            disabled:cursor-not-allowed
+                                            disabled:active:scale-100
                                         "
                                     >
 
@@ -2645,6 +2725,9 @@ export default function LeadDetails() {
                                     bg-slate-900
                                     rounded-3xl
                                     shadow-[0_12px_35px_rgba(15,23,42,0.15)]
+                                    transition-shadow
+                                    duration-300
+                                    hover:shadow-[0_16px_45px_rgba(15,23,42,0.22)]
                                 "
                             >
 
@@ -2699,6 +2782,8 @@ export default function LeadDetails() {
                                             setConvertModalOpen(true)
                                         }
                                         className="
+                                            cursor-pointer
+                                            group
                                             w-full
                                             mt-5
                                             inline-flex
@@ -2712,8 +2797,12 @@ export default function LeadDetails() {
                                             text-white
                                             text-sm
                                             font-semibold
+                                            transition-all
+                                            duration-200
                                             hover:bg-blue-500
-                                            transition
+                                            hover:shadow-lg
+                                            hover:shadow-blue-500/25
+                                            active:scale-[0.98]
                                         "
                                     >
 
@@ -2721,6 +2810,7 @@ export default function LeadDetails() {
 
                                         <ArrowUpRight
                                             size={16}
+                                            className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                                         />
 
                                     </button>
@@ -2832,6 +2922,7 @@ export default function LeadDetails() {
                                     setNoteOpen(true)
                                 }
                                 className="
+                                    cursor-pointer
                                     inline-flex
                                     items-center
                                     gap-2
@@ -2844,8 +2935,10 @@ export default function LeadDetails() {
                                     text-sm
                                     font-medium
                                     text-slate-700
+                                    transition-all
+                                    duration-200
                                     hover:bg-slate-50
-                                    transition
+                                    active:scale-[0.98]
                                 "
                             >
 
@@ -2861,6 +2954,7 @@ export default function LeadDetails() {
                                     setEditOpen(true)
                                 }
                                 className="
+                                    cursor-pointer
                                     inline-flex
                                     items-center
                                     gap-2
@@ -2873,8 +2967,10 @@ export default function LeadDetails() {
                                     text-sm
                                     font-medium
                                     text-slate-700
+                                    transition-all
+                                    duration-200
                                     hover:bg-slate-50
-                                    transition
+                                    active:scale-[0.98]
                                 "
                             >
 
@@ -2892,6 +2988,7 @@ export default function LeadDetails() {
                                         setConvertModalOpen(true)
                                     }
                                     className="
+                                        cursor-pointer
                                         inline-flex
                                         items-center
                                         gap-2
@@ -2902,9 +2999,12 @@ export default function LeadDetails() {
                                         text-white
                                         text-sm
                                         font-semibold
-                                        hover:bg-blue-700
                                         shadow-sm
-                                        transition
+                                        transition-all
+                                        duration-200
+                                        hover:bg-blue-700
+                                        hover:shadow-md
+                                        active:scale-[0.98]
                                     "
                                 >
 
@@ -3019,6 +3119,7 @@ export default function LeadDetails() {
                                         setDeleteModalOpen(false)
                                     }
                                     className="
+                                        cursor-pointer
                                         w-9
                                         h-9
                                         rounded-lg
@@ -3026,6 +3127,8 @@ export default function LeadDetails() {
                                         items-center
                                         justify-center
                                         text-slate-400
+                                        transition-colors
+                                        duration-200
                                         hover:bg-slate-50
                                         hover:text-slate-700
                                     "
@@ -3058,6 +3161,7 @@ export default function LeadDetails() {
                                         setDeleteModalOpen(false)
                                     }
                                     className="
+                                        cursor-pointer
                                         px-4
                                         py-2.5
                                         rounded-xl
@@ -3067,6 +3171,8 @@ export default function LeadDetails() {
                                         text-sm
                                         font-medium
                                         text-slate-700
+                                        transition-colors
+                                        duration-200
                                         hover:bg-slate-50
                                     "
                                 >
@@ -3077,6 +3183,7 @@ export default function LeadDetails() {
                                 <button
                                     onClick={deleteLead}
                                     className="
+                                        cursor-pointer
                                         inline-flex
                                         items-center
                                         gap-2
@@ -3087,7 +3194,10 @@ export default function LeadDetails() {
                                         text-white
                                         text-sm
                                         font-semibold
+                                        transition-all
+                                        duration-200
                                         hover:bg-red-700
+                                        active:scale-[0.98]
                                     "
                                 >
 

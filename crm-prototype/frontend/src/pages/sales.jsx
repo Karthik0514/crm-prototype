@@ -1,4 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+    ArrowDownRight,
+    ArrowUpRight,
+    Banknote,
+    CalendarDays,
+    CheckCircle2,
+    ChevronRight,
+    CircleDollarSign,
+    CreditCard,
+    IndianRupee,
+    RefreshCw,
+    TrendingUp,
+    Users,
+    X,
+} from "lucide-react";
 
 import api from "../services/api";
 
@@ -115,6 +130,26 @@ export default function Sales() {
 
 
     const totalSales = sales.length;
+
+    const collectedPercent =
+        totalSalesAmount > 0
+            ? Math.min(100, (totalPaid / totalSalesAmount) * 100)
+            : 0;
+
+    const pendingSales = sales.filter(
+        (sale) => (sale.payment_status || "Pending") === "Pending"
+    ).length;
+
+    const partialSales = sales.filter(
+        (sale) => sale.payment_status === "Partial"
+    ).length;
+
+    const paidSales = sales.filter(
+        (sale) => sale.payment_status === "Paid"
+    ).length;
+
+    const averageSale =
+        totalSales > 0 ? totalSalesAmount / totalSales : 0;
 
 
     // =========================================
@@ -295,10 +330,13 @@ export default function Sales() {
 
         return (
 
-            <div className="p-8">
-
-                Loading sales...
-
+            <div className="min-h-[60vh] flex items-center justify-center p-8">
+                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+                    <RefreshCw size={18} className="animate-spin text-blue-600" />
+                    <span className="text-sm font-medium text-slate-600">
+                        Loading sales dashboard...
+                    </span>
+                </div>
             </div>
 
         );
@@ -312,28 +350,52 @@ export default function Sales() {
 
     return (
 
-        <div className="space-y-8">
+        <div className="min-h-full space-y-8 bg-slate-50/60 p-1 sm:p-2">
 
 
             {/* ========================================= */}
             {/* HEADER */}
             {/* ========================================= */}
 
-            <div>
+            <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-900 px-6 py-7 text-white shadow-xl shadow-blue-950/10 sm:px-8">
+                <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blue-400/20 blur-3xl" />
+                <div className="absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-indigo-400/10 blur-3xl" />
 
-                <h1 className="text-3xl font-bold">
+                <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                    <div>
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-blue-100 backdrop-blur">
+                            <TrendingUp size={13} />
+                            Revenue Command Center
+                        </div>
 
-                    Sales
+                        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                            Sales
+                        </h1>
 
-                </h1>
+                        <p className="mt-2 max-w-xl text-sm leading-6 text-blue-100/80">
+                            Track revenue, payments, outstanding balances, and where your best sales are coming from.
+                        </p>
+                    </div>
 
-
-                <p className="text-gray-500">
-
-                    Track confirmed sales and payments
-
-                </p>
-
+                    <div className="grid grid-cols-2 gap-2 sm:flex">
+                        <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+                            <p className="text-[10px] uppercase tracking-wider text-blue-200/70">
+                                Avg. sale
+                            </p>
+                            <p className="mt-1 text-lg font-semibold">
+                                ₹{averageSale.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            </p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+                            <p className="text-[10px] uppercase tracking-wider text-blue-200/70">
+                                Collected
+                            </p>
+                            <p className="mt-1 text-lg font-semibold">
+                                {collectedPercent.toFixed(0)}%
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
 
@@ -341,81 +403,81 @@ export default function Sales() {
             {/* STATISTICS */}
             {/* ========================================= */}
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
 
-                <div className="bg-white border rounded-2xl p-6 shadow-sm">
-
-                    <p className="text-gray-500">
-
+                <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                    <div className="flex items-start justify-between">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                            <Users size={19} />
+                        </div>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+                            <ArrowUpRight size={11} />
+                            Active
+                        </span>
+                    </div>
+                    <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">
                         Total Sales
-
                     </p>
-
-
-                    <h2 className="text-4xl font-bold mt-2">
-
+                    <h2 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
                         {totalSales}
-
                     </h2>
-
                 </div>
 
 
-                <div className="bg-white border rounded-2xl p-6 shadow-sm">
-
-                    <p className="text-gray-500">
-
+                <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                    <div className="flex items-start justify-between">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                            <CircleDollarSign size={19} />
+                        </div>
+                        <TrendingUp size={17} className="text-blue-500" />
+                    </div>
+                    <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">
                         Total Revenue
-
                     </p>
-
-
-                    <h2 className="text-3xl font-bold text-blue-600 mt-2">
-
-                        ₹
-                        {totalSalesAmount.toLocaleString()}
-
+                    <h2 className="mt-1 text-2xl font-bold tracking-tight text-blue-600 sm:text-3xl">
+                        ₹{totalSalesAmount.toLocaleString()}
                     </h2>
-
                 </div>
 
 
-                <div className="bg-white border rounded-2xl p-6 shadow-sm">
-
-                    <p className="text-gray-500">
-
+                <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                    <div className="flex items-start justify-between">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                            <Banknote size={19} />
+                        </div>
+                        <span className="text-xs font-semibold text-emerald-600">
+                            {collectedPercent.toFixed(0)}%
+                        </span>
+                    </div>
+                    <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">
                         Amount Received
-
                     </p>
-
-
-                    <h2 className="text-3xl font-bold text-green-600 mt-2">
-
-                        ₹
-                        {totalPaid.toLocaleString()}
-
+                    <h2 className="mt-1 text-2xl font-bold tracking-tight text-emerald-600 sm:text-3xl">
+                        ₹{totalPaid.toLocaleString()}
                     </h2>
-
+                    <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                            className="h-full rounded-full bg-emerald-500 transition-all"
+                            style={{ width: `${collectedPercent}%` }}
+                        />
+                    </div>
                 </div>
 
 
-                <div className="bg-white border rounded-2xl p-6 shadow-sm">
-
-                    <p className="text-gray-500">
-
+                <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg">
+                    <div className="flex items-start justify-between">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+                            <CreditCard size={19} />
+                        </div>
+                        <ArrowDownRight size={17} className="text-rose-500" />
+                    </div>
+                    <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">
                         Outstanding
-
                     </p>
-
-
-                    <h2 className="text-3xl font-bold text-red-600 mt-2">
-
-                        ₹
-                        {outstandingAmount.toLocaleString()}
-
+                    <h2 className="mt-1 text-2xl font-bold tracking-tight text-rose-600 sm:text-3xl">
+                        ₹{outstandingAmount.toLocaleString()}
                     </h2>
-
                 </div>
 
 
@@ -426,14 +488,23 @@ export default function Sales() {
             {/* SALES BY SOURCE */}
             {/* ========================================= */}
 
-            <div className="bg-white border rounded-2xl p-6 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
 
-                <h2 className="text-xl font-bold mb-5">
-
-                    Sales by Source
-
-                </h2>
+                <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 className="text-lg font-bold tracking-tight text-slate-900">
+                            Sales by Source
+                        </h2>
+                        <p className="mt-1 text-xs text-slate-400">
+                            Revenue contribution by acquisition channel
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                        <span className="h-2 w-2 rounded-full bg-blue-500" />
+                        {Object.keys(sourceStats).length} channels
+                    </div>
+                </div>
 
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -452,21 +523,32 @@ export default function Sales() {
                                     key={source}
 
                                     className="
-                                        border
-                                        rounded-xl
+                                        group
+                                        rounded-2xl
+                                        border border-slate-200
+                                        bg-slate-50/50
                                         p-5
+                                        transition-all
+                                        hover:-translate-y-0.5
+                                        hover:border-blue-200
+                                        hover:bg-white
+                                        hover:shadow-md
                                     "
 
                                 >
 
-                                    <p className="text-gray-500">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <p className="text-sm font-semibold text-slate-700">
+                                            {source}
+                                        </p>
+                                        <ChevronRight
+                                            size={15}
+                                            className="text-slate-300 transition-transform group-hover:translate-x-1"
+                                        />
+                                    </div>
 
-                                        {source}
 
-                                    </p>
-
-
-                                    <h3 className="text-2xl font-bold mt-2">
+                                    <h3 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">
 
                                         ₹
                                         {stats.amount.toLocaleString()}
@@ -474,7 +556,7 @@ export default function Sales() {
                                     </h3>
 
 
-                                    <p className="text-sm text-gray-500 mt-1">
+                                    <p className="mt-1 text-xs text-slate-400">
 
                                         {stats.count} Sale
                                         {stats.count !== 1
@@ -520,7 +602,7 @@ export default function Sales() {
             {/* SALES TABLE */}
             {/* ========================================= */}
 
-            <div className="bg-white border rounded-2xl shadow-sm overflow-hidden">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
 
                 <div className="p-6 border-b">
@@ -541,10 +623,16 @@ export default function Sales() {
 
                         ? (
 
-                            <div className="p-8 text-gray-500">
-
-                                No sales have been recorded yet.
-
+                            <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                                    <IndianRupee size={23} />
+                                </div>
+                                <p className="mt-4 text-sm font-semibold text-slate-700">
+                                    No sales yet
+                                </p>
+                                <p className="mt-1 max-w-sm text-xs leading-5 text-slate-400">
+                                    Confirmed sales will appear here with their payment and due-date details.
+                                </p>
                             </div>
 
                         )
@@ -554,64 +642,64 @@ export default function Sales() {
                             <div className="overflow-x-auto">
 
 
-                                <table className="w-full">
+                                <table className="w-full min-w-[980px]">
 
 
-                                    <thead className="bg-gray-50">
+                                    <thead className="bg-slate-50/80">
 
 
                                         <tr>
 
-                                            <th className="text-left p-4">
+                                            <th className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-400">
 
                                                 Customer
 
                                             </th>
 
 
-                                            <th className="text-left p-4">
+                                            <th className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-400">
 
                                                 Company
 
                                             </th>
 
 
-                                            <th className="text-left p-4">
+                                            <th className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-400">
 
                                                 Source
 
                                             </th>
 
 
-                                            <th className="text-left p-4">
+                                            <th className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-400">
 
                                                 Sale Amount
 
                                             </th>
 
 
-                                            <th className="text-left p-4">
+                                            <th className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-400">
 
                                                 Paid
 
                                             </th>
 
 
-                                            <th className="text-left p-4">
+                                            <th className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-400">
 
                                                 Payment Status
 
                                             </th>
 
 
-                                            <th className="text-left p-4">
+                                            <th className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-slate-400">
 
                                                 Due Date
 
                                             </th>
 
 
-                                            <th className="text-center p-4">
+                                            <th className="whitespace-nowrap px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-400">
 
                                                 Action
 
@@ -637,35 +725,36 @@ export default function Sales() {
                                                         key={sale.id}
 
                                                         className="
-                                                            border-t
-                                                            hover:bg-gray-50
+                                                            border-t border-slate-100
+                                                            transition-colors
+                                                            hover:bg-blue-50/30
                                                         "
 
                                                     >
 
 
-                                                        <td className="p-4 font-medium">
+                                                        <td className="px-4 py-4 text-sm font-semibold text-slate-800">
 
                                                             {sale.customer_name}
 
                                                         </td>
 
 
-                                                        <td className="p-4">
+                                                        <td className="px-4 py-4 text-sm text-slate-600">
 
                                                             {sale.company}
 
                                                         </td>
 
 
-                                                        <td className="p-4">
+                                                        <td className="px-4 py-4 text-sm text-slate-600">
 
                                                             {sale.source}
 
                                                         </td>
 
 
-                                                        <td className="p-4 font-semibold">
+                                                        <td className="px-4 py-4 text-sm font-bold text-slate-900">
 
                                                             ₹
                                                             {Number(
@@ -675,7 +764,7 @@ export default function Sales() {
                                                         </td>
 
 
-                                                        <td className="p-4">
+                                                        <td className="px-4 py-4 text-sm text-slate-600">
 
                                                             ₹
                                                             {Number(
@@ -685,16 +774,20 @@ export default function Sales() {
                                                         </td>
 
 
-                                                        <td className="p-4">
+                                                        <td className="px-4 py-4 text-sm text-slate-600">
 
 
                                                             <span
 
                                                                 className={`
-                                                                    px-3
-                                                                    py-1
+                                                                    inline-flex
+                                                                    items-center
+                                                                    gap-1.5
                                                                     rounded-full
-                                                                    text-sm
+                                                                    px-2.5
+                                                                    py-1.5
+                                                                    text-xs
+                                                                    font-semibold
                                                                     ${paymentStatusColor(
                                                                     sale.payment_status
                                                                 )}
@@ -712,7 +805,7 @@ export default function Sales() {
                                                         </td>
 
 
-                                                        <td className="p-4">
+                                                        <td className="px-4 py-4 text-sm text-slate-600">
 
 
                                                             {
@@ -747,18 +840,30 @@ export default function Sales() {
                                                                 }
 
                                                                 className="
+                                                                    cursor-pointer
+                                                                    inline-flex
+                                                                    items-center
+                                                                    gap-1.5
+                                                                    rounded-xl
                                                                     bg-blue-600
-                                                                    hover:bg-blue-700
-                                                                    text-white
-                                                                    px-4
+                                                                    px-3.5
                                                                     py-2
-                                                                    rounded-lg
+                                                                    text-xs
+                                                                    font-semibold
+                                                                    text-white
+                                                                    shadow-sm
+                                                                    shadow-blue-600/20
+                                                                    transition-all
+                                                                    hover:-translate-y-0.5
+                                                                    hover:bg-blue-700
+                                                                    hover:shadow-md
+                                                                    active:scale-95
                                                                 "
 
                                                             >
 
                                                                 Update
-
+                                                                <ChevronRight size={13} />
                                                             </button>
 
 
@@ -801,37 +906,52 @@ export default function Sales() {
                     <div className="
                         fixed
                         inset-0
-                        bg-black
-                        bg-opacity-50
+                        z-50
                         flex
                         items-center
                         justify-center
-                        z-50
+                        bg-slate-950/60
                         p-4
+                        backdrop-blur-sm
                     ">
 
 
                         <div className="
-                            bg-white
-                            rounded-2xl
-                            p-6
                             w-full
                             max-w-lg
+                            rounded-3xl
+                            border border-slate-200
+                            bg-white
+                            p-6
+                            shadow-2xl
+                            shadow-slate-950/20
+                            sm:p-7
                         ">
 
 
-                            <h2 className="text-2xl font-bold mb-1">
+                            <div className="mb-6 flex items-start justify-between gap-4">
+                                <div>
+                                    <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-blue-700">
+                                        <CreditCard size={12} />
+                                        Payment details
+                                    </div>
+                                    <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+                                        Update Payment
+                                    </h2>
+                                    <p className="mt-1 text-sm text-slate-400">
+                                        {selectedSale.customer_name}
+                                    </p>
+                                </div>
 
-                                Update Payment
-
-                            </h2>
-
-
-                            <p className="text-gray-500 mb-6">
-
-                                {selectedSale.customer_name}
-
-                            </p>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedSale(null)}
+                                    className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                                    title="Close"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
 
 
                             <div className="space-y-4">
@@ -841,10 +961,7 @@ export default function Sales() {
 
 
                                     <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        mb-2
+                                        mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500
                                     ">
 
                                         Amount Paid
@@ -869,11 +986,7 @@ export default function Sales() {
                                         }
 
                                         className="
-                                            w-full
-                                            border
-                                            rounded-xl
-                                            px-4
-                                            py-3
+                                            w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-500/10
                                         "
 
                                     />
@@ -886,10 +999,7 @@ export default function Sales() {
 
 
                                     <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        mb-2
+                                        mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500
                                     ">
 
                                         Payment Status
@@ -910,11 +1020,7 @@ export default function Sales() {
                                         }
 
                                         className="
-                                            w-full
-                                            border
-                                            rounded-xl
-                                            px-4
-                                            py-3
+                                            w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-500/10
                                         "
 
                                     >
@@ -950,13 +1056,11 @@ export default function Sales() {
 
 
                                     <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        mb-2
+                                        mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500
                                     ">
 
                                         Payment Due Date
+                                        <CalendarDays size={13} className="ml-1 inline text-slate-400" />
 
                                     </label>
 
@@ -976,11 +1080,7 @@ export default function Sales() {
                                         }
 
                                         className="
-                                            w-full
-                                            border
-                                            rounded-xl
-                                            px-4
-                                            py-3
+                                            w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-500/10
                                         "
 
                                     />
@@ -993,10 +1093,7 @@ export default function Sales() {
 
 
                                     <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        mb-2
+                                        mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500
                                     ">
 
                                         Payment Notes
@@ -1019,11 +1116,7 @@ export default function Sales() {
                                         rows="4"
 
                                         className="
-                                            w-full
-                                            border
-                                            rounded-xl
-                                            px-4
-                                            py-3
+                                            w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-500/10
                                         "
 
                                         placeholder="
@@ -1040,10 +1133,7 @@ export default function Sales() {
 
 
                             <div className="
-                                flex
-                                justify-end
-                                gap-3
-                                mt-6
+                                mt-7 flex justify-end gap-3 border-t border-slate-100 pt-5
                             ">
 
 
@@ -1058,10 +1148,7 @@ export default function Sales() {
                                     }
 
                                     className="
-                                        px-5
-                                        py-3
-                                        rounded-xl
-                                        border
+                                        cursor-pointer rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 active:scale-95
                                     "
 
                                 >
@@ -1078,13 +1165,7 @@ export default function Sales() {
                                     disabled={savingPayment}
 
                                     className="
-                                        bg-blue-600
-                                        hover:bg-blue-700
-                                        disabled:bg-blue-400
-                                        text-white
-                                        px-5
-                                        py-3
-                                        rounded-xl
+                                        cursor-pointer rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition hover:bg-blue-700 active:scale-95 disabled:cursor-not-allowed disabled:bg-blue-400
                                     "
 
                                 >

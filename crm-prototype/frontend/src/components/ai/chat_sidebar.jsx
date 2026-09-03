@@ -136,6 +136,7 @@ export default function ChatSidebar({
                 <button
                     onClick={createChat}
                     className="
+                        cursor-pointer
                         flex
                         w-full
                         items-center
@@ -413,6 +414,7 @@ export default function ChatSidebar({
                                                 )
                                             }
                                             className="
+                                                cursor-pointer
                                                 flex
                                                 h-8
                                                 w-8

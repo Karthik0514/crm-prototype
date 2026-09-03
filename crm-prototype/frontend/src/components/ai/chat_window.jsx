@@ -201,7 +201,7 @@ function formatAIResponse(text) {
                     <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
                         <UserRound
                             size={18}
-                            className="text-blue-600"
+                            className="text-white"
                         />
                     </div>
 
@@ -451,7 +451,8 @@ export default function ChatWindow({
 
     return (
 
-        <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+        <div className="flex-1 overflow-y-auto bg-slate-50/80 px-4 py-5 sm:px-6 lg:px-8"
+            style={{ scrollbarGutter: "stable" }}>
 
             {/* ================================================= */}
             {/* EMPTY STATE */}
@@ -461,9 +462,13 @@ export default function ChatWindow({
 
                 <div className="h-full flex items-center justify-center">
 
-                    <div className="text-center max-w-md">
+                    <div className="text-center max-w-lg">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm mb-5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            AI Sales Assistant
+                        </div>
 
-                        <div className="mx-auto w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-5">
+                        <div className="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center mb-5 shadow-lg shadow-blue-200/60 ring-8 ring-blue-50">
 
                             <Sparkles
                                 size={30}
@@ -472,13 +477,13 @@ export default function ChatWindow({
 
                         </div>
 
-                        <h2 className="text-2xl font-semibold text-gray-900">
+                        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
 
                             Welcome to Konaseema CRM AI
 
                         </h2>
 
-                        <p className="mt-3 text-gray-500 text-sm leading-6">
+                        <p className="mt-3 text-slate-500 text-sm leading-6 max-w-md mx-auto">
 
                             Your AI Sales Assistant is ready.
                             Ask about leads, generate follow-ups,
@@ -488,19 +493,19 @@ export default function ChatWindow({
 
                         <div className="flex flex-wrap justify-center gap-2 mt-6">
 
-                            <div className="px-3 py-2 rounded-lg bg-white border text-xs text-gray-600">
+                            <div className="group px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
                                 Lead Analysis
                             </div>
 
-                            <div className="px-3 py-2 rounded-lg bg-white border text-xs text-gray-600">
+                            <div className="group px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
                                 Email Generation
                             </div>
 
-                            <div className="px-3 py-2 rounded-lg bg-white border text-xs text-gray-600">
+                            <div className="group px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
                                 WhatsApp
                             </div>
 
-                            <div className="px-3 py-2 rounded-lg bg-white border text-xs text-gray-600">
+                            <div className="group px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
                                 CRM Actions
                             </div>
 
@@ -517,7 +522,7 @@ export default function ChatWindow({
             {/* MESSAGES */}
             {/* ================================================= */}
 
-            <div className="space-y-6">
+            <div className="mx-auto w-full max-w-5xl space-y-7 pb-4">
 
                 {messages.map((message, index) => {
 
@@ -529,8 +534,8 @@ export default function ChatWindow({
                         <div
                             key={index}
                             className={`flex items-start gap-3 ${isUser
-                                    ? "justify-end"
-                                    : "justify-start"
+                                ? "justify-end"
+                                : "justify-start"
                                 }`}
                         >
 
@@ -540,7 +545,7 @@ export default function ChatWindow({
 
                             {!isUser && (
 
-                                <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 shadow-sm">
 
                                     {getResponseIcon(
                                         message.text
@@ -556,9 +561,9 @@ export default function ChatWindow({
                             {/* ================================================= */}
 
                             <div
-                                className={`max-w-[78%] ${isUser
-                                        ? "order-first"
-                                        : ""
+                                className={`w-fit max-w-[88%] sm:max-w-[78%] ${isUser
+                                    ? "order-first"
+                                    : ""
                                     }`}
                             >
 
@@ -572,7 +577,7 @@ export default function ChatWindow({
 
                                         <div className="flex items-center gap-2 mb-1">
 
-                                            <span className="text-xs text-gray-400">
+                                            <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                                                 You
                                             </span>
 
@@ -583,9 +588,9 @@ export default function ChatWindow({
 
                                         </div>
 
-                                        <div className="bg-blue-600 text-white rounded-2xl rounded-tr-md px-5 py-3 shadow-sm">
+                                        <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl rounded-tr-md px-5 py-3.5 shadow-md shadow-blue-200/50 ring-1 ring-blue-700/10">
 
-                                            <p className="text-sm leading-6 whitespace-pre-wrap">
+                                            <p className="text-sm leading-6 whitespace-pre-wrap break-words">
                                                 {message.text}
                                             </p>
 
@@ -603,7 +608,7 @@ export default function ChatWindow({
 
                                         <div className="flex items-center gap-2 mb-1">
 
-                                            <span className="text-xs font-medium text-gray-500">
+                                            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                                                 Konaseema AI
                                             </span>
 
@@ -614,7 +619,7 @@ export default function ChatWindow({
 
                                         </div>
 
-                                        <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-md px-5 py-4 shadow-sm">
+                                        <div className="bg-white/95 border border-slate-200 rounded-2xl rounded-tl-md px-5 py-4.5 shadow-sm shadow-slate-200/60 ring-1 ring-slate-900/[0.02]">
 
                                             {formatAIResponse(
                                                 message.text

@@ -456,6 +456,7 @@ export default function Navbar() {
                                         <button
                                             onClick={markAllAsRead}
                                             className="
+                                                cursor-pointer
                                                 flex
                                                 h-8
                                                 w-8
@@ -479,6 +480,7 @@ export default function Navbar() {
                                             setShowNotifications(false)
                                         }
                                         className="
+                                            cursor-pointer
                                             flex
                                             h-8
                                             w-8
@@ -626,6 +628,7 @@ export default function Navbar() {
 
                                                                 }}
                                                                 className="
+                                                                    cursor-pointer
                                                                     flex
                                                                     h-7
                                                                     w-7
