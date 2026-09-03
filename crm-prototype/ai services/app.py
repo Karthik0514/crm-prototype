@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header
 import ollama
 
 from ai import analyze_lead
@@ -82,7 +82,7 @@ def build_lead_request(lead):
 # ==================================================
 # HELPER FUNCTIONS
 # ==================================================
-#
+
 # The AI agents may return either:
 #
 # 1. A dictionary
@@ -137,7 +137,7 @@ def get_call_script(script):
 
 
 @app.post("/chat", response_model=ChatResponse)
-def chat(request: ChatRequest):
+def chat(request: ChatRequest, authorization: str | None = Header(default=None)):
 
     # ==================================================
     # BASIC VALIDATION
@@ -249,9 +249,11 @@ IMPORTANT RULES:
 
 12. NEVER invent a lead name.
 
+
 13. If the user did not explicitly mention a lead name,
     and a remembered/current lead exists,
     use the remembered/current lead.
+
 
 14. The current lead has priority over any lead name
     hallucinated by the intent classifier.
@@ -326,7 +328,7 @@ IMPORTANT RULES:
     # ==================================================
     # IMPORTANT MEMORY RULE
     # ==================================================
-    #
+
     # If the user says:
     #
     # "write an email"
@@ -420,7 +422,12 @@ IMPORTANT RULES:
 
         print("Searching CRM for:", lead_name)
 
-        lead_results = search_lead(lead_name)
+        # ==================================================
+        # JWT FORWARDING
+        # FastAPI -> Express CRM Tools
+        # ==================================================
+
+        lead_results = search_lead(lead_name, authorization)
 
     print("Lead Results:", lead_results)
 
@@ -430,7 +437,7 @@ IMPORTANT RULES:
 
     if action == "list_leads":
 
-        all_leads = get_all_leads()
+        all_leads = get_all_leads(authorization)
 
         messages.append(
             {
@@ -510,7 +517,7 @@ Do not invent leads or information.
 
         lead[field] = value
 
-        update_lead(lead["id"], lead)
+        update_lead(lead["id"], lead, authorization)
 
         return ChatResponse(
             response=(f"{lead['name']} " f"updated successfully."),
@@ -526,7 +533,7 @@ Do not invent leads or information.
 
         lead = lead_results[0]
 
-        delete_lead(lead["id"])
+        delete_lead(lead["id"], authorization)
 
         return ChatResponse(
             response=(f"{lead['name']} " f"deleted successfully."),
@@ -542,7 +549,7 @@ Do not invent leads or information.
 
         lead = lead_results[0]
 
-        convert_lead(lead["id"])
+        convert_lead(lead["id"], authorization)
 
         return ChatResponse(
             response=(f"{lead['name']} " f"converted successfully."),

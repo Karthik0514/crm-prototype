@@ -3,11 +3,43 @@ import requests
 BACKEND = "http://localhost:5000/api/tools"
 
 
-def search_lead(name):
+def get_headers(token=None):
 
-    response = requests.get(
-        f"{BACKEND}/search/{name}"
-    )
+    if not token:
+        return {}
+
+    return {"Authorization": token}
+
+
+# ======================================================
+# SEARCH LEAD
+# ======================================================
+
+
+def search_lead(name, token=None):
+
+    response = requests.get(f"{BACKEND}/search/{name}", headers=get_headers(token))
+
+    print("SEARCH STATUS:", response.status_code)
+
+    print("SEARCH RESPONSE:", response.text)
+
+    if response.status_code == 200:
+        return response.json()
+
+    return []
+
+
+# ======================================================
+# GET ALL LEADS
+# ======================================================
+
+
+def get_all_leads(token=None):
+
+    response = requests.get(f"{BACKEND}/all", headers=get_headers(token))
+
+    print("ALL LEADS STATUS:", response.status_code)
 
     if response.status_code == 200:
         return response.json()
@@ -15,39 +47,51 @@ def search_lead(name):
     return []
 
 
-def update_lead(id, lead):
+# ======================================================
+# UPDATE LEAD
+# ======================================================
+
+
+def update_lead(id, lead, token=None):
 
     response = requests.put(
-        f"{BACKEND}/update/{id}",
-        json=lead
+        f"{BACKEND}/update/{id}", json=lead, headers=get_headers(token)
     )
+
+    print("UPDATE STATUS:", response.status_code)
+
+    print("UPDATE RESPONSE:", response.text)
 
     return response.json()
 
 
-def delete_lead(id):
-
-    response = requests.delete(
-        f"{BACKEND}/delete/{id}"
-    )
-
-    return response.json()
+# ======================================================
+# DELETE LEAD
+# ======================================================
 
 
-def convert_lead(id):
+def delete_lead(id, token=None):
 
-    response = requests.put(
-        f"{BACKEND}/convert/{id}"
-    )
+    response = requests.delete(f"{BACKEND}/delete/{id}", headers=get_headers(token))
+
+    print("DELETE STATUS:", response.status_code)
+
+    print("DELETE RESPONSE:", response.text)
 
     return response.json()
 
 
-def get_all_leads():
+# ======================================================
+# CONVERT LEAD
+# ======================================================
 
-    response = requests.get(f"{BACKEND}/all")
 
-    if response.status_code == 200:
-        return response.json()
+def convert_lead(id, token=None):
 
-    return []
+    response = requests.put(f"{BACKEND}/convert/{id}", headers=get_headers(token))
+
+    print("CONVERT STATUS:", response.status_code)
+
+    print("CONVERT RESPONSE:", response.text)
+
+    return response.json()
