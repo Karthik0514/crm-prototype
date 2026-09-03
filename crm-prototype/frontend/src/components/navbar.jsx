@@ -311,6 +311,7 @@ export default function Navbar() {
                 <button
                     onClick={() => navigate("/profile")}
                     className="
+                        cursor-pointer
                         flex
                         h-11
                         w-11
@@ -344,6 +345,7 @@ export default function Navbar() {
                             )
                         }
                         className="
+                            cursor-pointer
                             relative
                             z-10
                             flex
