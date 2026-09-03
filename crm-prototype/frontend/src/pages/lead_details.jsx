@@ -4,6 +4,7 @@ import {
     Building2,
     CalendarDays,
     Check,
+    CreditCard,
     CheckCircle2,
     ChevronDown,
     CircleUserRound,
@@ -132,6 +133,7 @@ export default function LeadDetails() {
 
     const [lead, setLead] = useState(null);
     const [analysis, setAnalysis] = useState(null);
+    const [sale, setSale] = useState(null);
 
     const [loading, setLoading] = useState(true);
 
@@ -170,8 +172,39 @@ export default function LeadDetails() {
             const leadResponse =
                 await api.get(`/leads/${id}`);
 
-            setLead(leadResponse.data);
+            const currentLead = leadResponse.data;
 
+            setLead(currentLead);
+
+            // Converted leads use the customer/sale view only.
+            // Do not load or display AI lead-analysis data for them.
+            if (currentLead.status === "Converted") {
+
+                setAnalysis(null);
+
+                try {
+                    const salesResponse = await api.get("/sales");
+                    const sales = Array.isArray(salesResponse.data)
+                        ? salesResponse.data
+                        : [];
+
+                    const convertedSale = sales.find(
+                        (item) => Number(item.lead_id) === Number(id)
+                    );
+
+                    setSale(convertedSale || null);
+                } catch (saleError) {
+                    console.error(
+                        "Failed to load converted sale:",
+                        saleError
+                    );
+                    setSale(null);
+                }
+
+                return;
+            }
+
+            setSale(null);
 
             const aiResponse =
                 await api.get(`/leads/${id}/analyze`);
@@ -437,7 +470,10 @@ export default function LeadDetails() {
     // NOT FOUND
     // ========================================================
 
-    if (!lead || !analysis) {
+    const isConverted = lead?.status === "Converted";
+
+
+    if (!lead || (!isConverted && !analysis)) {
 
         return (
 
@@ -490,6 +526,522 @@ export default function LeadDetails() {
 
             </div>
 
+        );
+    }
+
+
+    // ========================================================
+    // CONVERTED CUSTOMER VIEW
+    // ========================================================
+
+    // IMPORTANT: Everything below this point is the existing lead UI.
+    // It is intentionally untouched for non-converted leads.
+    if (isConverted) {
+
+        const saleAmount = Number(sale?.sale_amount || 0);
+        const amountPaid = Number(sale?.amount_paid || 0);
+        const outstanding = Math.max(saleAmount - amountPaid, 0);
+
+        const paymentStatus = sale?.payment_status || "Pending";
+
+        const paymentStatusClasses =
+            paymentStatus === "Paid"
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                : paymentStatus === "Partial"
+                    ? "bg-amber-50 text-amber-700 border-amber-200"
+                    : paymentStatus === "Overdue"
+                        ? "bg-red-50 text-red-700 border-red-200"
+                        : "bg-slate-50 text-slate-700 border-slate-200";
+
+        return (
+            <div className="min-h-screen bg-slate-50">
+                <div className="max-w-7xl mx-auto px-6 py-8">
+
+                    <button
+                        onClick={() => navigate("/leads")}
+                        className="group inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition mb-6"
+                    >
+                        <ArrowLeft size={17} className="group-hover:-translate-x-0.5 transition" />
+                        Back to Leads
+                    </button>
+
+                    <section className="relative overflow-hidden bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                        <div className="absolute right-0 top-0 w-72 h-72 bg-emerald-50 rounded-full -translate-y-1/2 translate-x-1/2" />
+                        <div className="relative p-7 lg:p-8">
+                            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                                <div className="flex items-start gap-5">
+                                    <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center flex-shrink-0">
+                                        <CheckCircle2 size={30} className="text-emerald-600" />
+                                    </div>
+
+                                    <div>
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-950">
+                                                {lead.name}
+                                            </h1>
+
+                                            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                Converted Customer
+                                            </span>
+                                        </div>
+
+                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+                                            {lead.company && (
+                                                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                                                    <Building2 size={15} />
+                                                    {lead.company}
+                                                </div>
+                                            )}
+
+                                            {lead.source && (
+                                                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                                                    <Zap size={15} />
+                                                    {lead.source}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <p className="text-sm text-emerald-700 mt-3">
+                                            This lead has successfully moved from prospect to customer.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setEditOpen(true)}
+                                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition"
+                                    >
+                                        <Pencil size={15} />
+                                        Edit Customer
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="mt-7 pt-6 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center">
+                                        <Phone size={16} className="text-slate-500" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-[11px] uppercase tracking-wide font-semibold text-slate-400">Phone</p>
+                                        <p className="text-sm font-medium text-slate-800 truncate">{lead.phone || "Not provided"}</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center">
+                                        <Mail size={16} className="text-slate-500" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-[11px] uppercase tracking-wide font-semibold text-slate-400">Email</p>
+                                        <p className="text-sm font-medium text-slate-800 truncate">{lead.email || "Not provided"}</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center">
+                                        <CalendarDays size={16} className="text-slate-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] uppercase tracking-wide font-semibold text-slate-400">Created</p>
+                                        <p className="text-sm font-medium text-slate-800">{formatDate(lead.created_at)}</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                        <CheckCircle2 size={16} className="text-emerald-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] uppercase tracking-wide font-semibold text-slate-400">Customer Status</p>
+                                        <p className="text-sm font-semibold text-emerald-600">Converted</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+
+                        <div className="lg:col-span-2 space-y-6">
+
+                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                                <div className="p-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                            <CreditCard size={18} className="text-emerald-600" />
+                                        </div>
+                                        <div>
+                                            <h2 className="font-semibold text-slate-900">Sale Overview</h2>
+                                            <p className="text-xs text-slate-400 mt-0.5">Customer transaction details</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                                        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5">
+                                            <p className="text-xs font-medium text-slate-500">Sale Amount</p>
+                                            <p className="text-2xl font-bold text-slate-950 mt-2">
+                                                {sale ? `₹${saleAmount.toLocaleString("en-IN")}` : "—"}
+                                            </p>
+                                        </div>
+
+                                        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5">
+                                            <p className="text-xs font-medium text-slate-500">Amount Paid</p>
+                                            <p className="text-2xl font-bold text-emerald-600 mt-2">
+                                                {sale ? `₹${amountPaid.toLocaleString("en-IN")}` : "—"}
+                                            </p>
+                                        </div>
+
+                                        <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5">
+                                            <p className="text-xs font-medium text-slate-500">Outstanding</p>
+                                            <p className={`text-2xl font-bold mt-2 ${outstanding > 0 ? "text-amber-600" : "text-emerald-600"}`}>
+                                                {sale ? `₹${outstanding.toLocaleString("en-IN")}` : "—"}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-5 rounded-2xl border border-slate-100 divide-y divide-slate-100">
+                                        <div className="flex items-center justify-between gap-4 px-5 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <CreditCard size={17} className="text-slate-400" />
+                                                <span className="text-sm text-slate-500">Payment Status</span>
+                                            </div>
+                                            <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${paymentStatusClasses}`}>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                                                {paymentStatus}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center justify-between gap-4 px-5 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <CalendarDays size={17} className="text-slate-400" />
+                                                <span className="text-sm text-slate-500">Payment Due</span>
+                                            </div>
+                                            <span className="text-sm font-medium text-slate-800">
+                                                {sale?.payment_due_date ? formatDate(sale.payment_due_date) : "No due date"}
+                                            </span>
+                                        </div>
+
+                                        {sale?.payment_notes && (
+                                            <div className="px-5 py-4">
+                                                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Payment Notes</p>
+                                                <p className="text-sm leading-6 text-slate-600 whitespace-pre-wrap">{sale.payment_notes}</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {!sale && (
+                                        <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                                            This lead is converted, but the associated sale record could not be loaded.
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+
+                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                                <div className="p-6">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                                                <FileText size={18} className="text-amber-600" />
+                                            </div>
+                                            <div>
+                                                <h2 className="font-semibold text-slate-900">Customer Notes</h2>
+                                                <p className="text-xs text-slate-400 mt-0.5">Internal notes about this customer</p>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => { setNoteText(""); setNoteOpen(true); }}
+                                            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition"
+                                        >
+                                            <Plus size={14} />
+                                            Add Note
+                                        </button>
+                                    </div>
+
+                                    <div className="mt-5">
+                                        {lead.notes?.trim() ? (
+                                            <div className="relative rounded-2xl bg-amber-50/60 border border-amber-100 p-5">
+                                                <div className="absolute left-0 top-5 bottom-5 w-1 rounded-r-full bg-amber-400" />
+                                                <p className="pl-3 text-sm leading-7 text-slate-700 whitespace-pre-wrap">{lead.notes}</p>
+                                            </div>
+                                        ) : (
+                                            <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center">
+                                                <FileText size={22} className="mx-auto text-slate-300" />
+                                                <p className="text-sm font-medium text-slate-600 mt-3">No notes yet</p>
+                                                <p className="text-xs text-slate-400 mt-1">Add the first note for this customer.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                                <div className="p-6">
+                                    <div className="flex items-center gap-3 mb-7">
+                                        <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                            <TrendingUp size={18} className="text-emerald-600" />
+                                        </div>
+                                        <div>
+                                            <h2 className="font-semibold text-slate-900">Customer Journey</h2>
+                                            <p className="text-xs text-slate-400 mt-0.5">From prospect to customer</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        {[
+                                            ["Lead Created", "Lead entered the CRM", true],
+                                            ["Sales Engagement", "Lead progressed through the sales process", true],
+                                            ["Converted", "Lead successfully became a customer", true],
+                                        ].map(([title, description, done]) => (
+                                            <div key={title} className="flex items-start gap-4">
+                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${done ? "bg-emerald-50 border border-emerald-200" : "bg-slate-50 border border-slate-200"}`}>
+                                                    <CheckCircle2 size={17} className={done ? "text-emerald-600" : "text-slate-400"} />
+                                                </div>
+                                                <div className="pt-1">
+                                                    <p className="text-sm font-semibold text-slate-800">{title}</p>
+                                                    <p className="text-xs text-slate-400 mt-1">{description}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div className="space-y-6">
+                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                                <div className="p-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+                                            <UserRound size={18} className="text-slate-600" />
+                                        </div>
+                                        <div>
+                                            <h2 className="font-semibold text-slate-900">Customer Snapshot</h2>
+                                            <p className="text-xs text-slate-400 mt-0.5">Current CRM information</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-6 space-y-4">
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="text-sm text-slate-500">Status</span>
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                Converted
+                                            </span>
+                                        </div>
+                                        <div className="h-px bg-slate-100" />
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="text-sm text-slate-500">Source</span>
+                                            <span className="text-sm font-medium text-slate-800 text-right">{lead.source || "—"}</span>
+                                        </div>
+                                        <div className="h-px bg-slate-100" />
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="text-sm text-slate-500">Company</span>
+                                            <span className="text-sm font-medium text-slate-800 text-right">{lead.company || "—"}</span>
+                                        </div>
+                                        <div className="h-px bg-slate-100" />
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="text-sm text-slate-500">Created</span>
+                                            <span className="text-sm font-medium text-slate-800">{formatDate(lead.created_at)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section className="bg-white border border-slate-200 rounded-3xl shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                                <div className="p-6">
+                                    <div className="flex items-center gap-3 mb-5">
+                                        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                                            <Zap size={18} className="text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <h2 className="font-semibold text-slate-900">Customer Actions</h2>
+                                            <p className="text-xs text-slate-400 mt-0.5">Manage this customer</p>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={() => navigate("/sales")}
+                                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition"
+                                    >
+                                        <CreditCard size={16} />
+                                        View Sales
+                                        <ArrowUpRight size={15} />
+                                    </button>
+
+                                    <button
+                                        onClick={() => { setNoteText(""); setNoteOpen(true); }}
+                                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition mt-3"
+                                    >
+                                        <FileText size={16} />
+                                        Add Customer Note
+                                    </button>
+
+                                    <button
+                                        onClick={() => setEditOpen(true)}
+                                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition mt-3"
+                                    >
+                                        <Pencil size={16} />
+                                        Edit Customer
+                                    </button>
+                                </div>
+                            </section>
+
+                            <section className="bg-white border border-red-100 rounded-3xl">
+                                <div className="p-5">
+                                    <button
+                                        onClick={() => setDeleteModalOpen(true)}
+                                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-600 text-sm font-semibold hover:bg-red-50 transition"
+                                    >
+                                        <Trash2 size={16} />
+                                        Delete Customer Record
+                                    </button>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+
+                    <section className="sticky bottom-4 z-30 mt-6 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-[0_12px_40px_rgba(15,23,42,0.10)] p-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div className="flex items-center gap-3 px-2">
+                                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                                    <CheckCircle2 size={16} className="text-emerald-600" />
+                                </div>
+                                <div className="hidden sm:block">
+                                    <p className="text-xs text-slate-400">Customer account</p>
+                                    <p className="text-sm font-semibold text-slate-800 max-w-[220px] truncate">{lead.name}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <button
+                                    onClick={() => { setNoteText(""); setNoteOpen(true); }}
+                                    className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                                >
+                                    <FileText size={15} />
+                                    Add Note
+                                </button>
+                                <button
+                                    onClick={() => setEditOpen(true)}
+                                    className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                                >
+                                    <Pencil size={15} />
+                                    Edit
+                                </button>
+                                <button
+                                    onClick={() => navigate("/sales")}
+                                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition"
+                                >
+                                    <CreditCard size={15} />
+                                    View Sale
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <AddLeadModal
+                    open={editOpen}
+                    setOpen={setEditOpen}
+                    fetchLeads={refreshLead}
+                    editingLead={lead}
+                />
+
+                {noteOpen && (
+                    <div
+                        className="fixed inset-0 z-[100] bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4"
+                        onClick={() => setNoteOpen(false)}
+                    >
+                        <div
+                            className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                                        <FileText size={18} className="text-amber-600" />
+                                    </div>
+                                    <div>
+                                        <h2 className="font-semibold text-slate-900">Add Customer Note</h2>
+                                        <p className="text-xs text-slate-400">{lead.name}</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setNoteOpen(false)} className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition">
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <div className="p-6">
+                                <textarea
+                                    value={noteText}
+                                    onChange={(e) => setNoteText(e.target.value)}
+                                    placeholder="Write an internal note about this customer..."
+                                    rows={6}
+                                    autoFocus
+                                    className="w-full resize-none bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                                />
+                            </div>
+
+                            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+                                <button
+                                    onClick={() => { setNoteText(""); setNoteOpen(false); }}
+                                    className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={saveNote}
+                                    disabled={savingNote || !noteText.trim()}
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <Check size={15} />
+                                    {savingNote ? "Saving..." : "Save Note"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {deleteModalOpen && (
+                    <div
+                        className="fixed inset-0 z-[100] bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4"
+                        onClick={() => setDeleteModalOpen(false)}
+                    >
+                        <div
+                            className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="p-6">
+                                <div className="flex items-start justify-between">
+                                    <div className="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center">
+                                        <Trash2 size={19} className="text-red-600" />
+                                    </div>
+                                    <button onClick={() => setDeleteModalOpen(false)} className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-50">
+                                        <X size={18} />
+                                    </button>
+                                </div>
+                                <h2 className="text-lg font-semibold text-slate-950 mt-5">Delete this customer?</h2>
+                                <p className="text-sm text-slate-500 leading-6 mt-2">
+                                    You're about to permanently delete <span className="font-semibold text-slate-700">{lead.name}</span>. This action cannot be undone.
+                                </p>
+                                <div className="flex justify-end gap-2 mt-7">
+                                    <button onClick={() => setDeleteModalOpen(false)} className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50">
+                                        Cancel
+                                    </button>
+                                    <button onClick={deleteLead} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700">
+                                        <Trash2 size={15} />
+                                        Delete Customer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         );
     }
 
