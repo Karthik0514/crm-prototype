@@ -380,4 +380,30 @@ db.serialize(() => {
 
     });
 
+    // ==========================================
+    // EMPLOYEES TABLE
+    // ==========================================
+
+    db.run(`
+    CREATE TABLE IF NOT EXISTS employees (
+
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        name TEXT NOT NULL,
+
+        email TEXT NOT NULL UNIQUE,
+
+        phone TEXT,
+
+        role TEXT NOT NULL,
+
+        department TEXT,
+
+        status TEXT DEFAULT 'Active',
+
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
+    )
+`);
+
 });

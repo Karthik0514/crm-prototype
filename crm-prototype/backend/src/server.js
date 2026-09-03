@@ -8,7 +8,7 @@ import chatRoutes from "./routes/chat.js";
 import salesRoutes from "./routes/sales.js";
 import notificationRoutes from "./routes/notifications.js";
 import authRoutes from "./routes/auth.js";
-
+import employeeRoutes from "./routes/employees.js";
 import authenticateToken from "./middleware/auth.js";
 
 import "dotenv/config";
@@ -111,6 +111,7 @@ app.use(
 
 );
 
+app.use("/api/employees", employeeRoutes);
 
 // ==========================================
 // START SERVER
